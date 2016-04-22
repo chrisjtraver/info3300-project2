@@ -5,9 +5,70 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"> </script> <!--JQuery Library Import-->
   <link rel="stylesheet" type="text/css" href="style.css"> <!--External CSS Import-->
   <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,500,100' rel='stylesheet' type='text/css'> <!-- Import Roboto Font -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"> <!-- Import Bootstrap -->
+  <script src="http://d3js.org/topojson.v1.min.js"></script> <!-- Import map JSON -->
 </head>
 
 <body>
-<h1>INFO 3300 - Project 2</h1>
+
+<div class="container">
+    <div class="row title-row">
+        <div class="col-xs-12" id="title">
+            <h1 class="center">MVP Comparison Tool</h1>
+        </div>
+    </div>
+
+    <div class="row main-visualizations">
+        <div class="col-md-7" id="mvp-picker"></div>
+        <div class="col-md-5" id="mvp-stats"></div>
+    </div>
+    <div class="row mvp-comparison-tool">
+        <div class="col-md-6" id="compare-mvp1"></div>
+        <div class="col-md-6" id="compare-mvp2"></div>
+    </div>
+    <div class="row overall-mvp-stats">
+        <div class="col-xs-12" id="overall-stats"></div>
+    </div>
+</div> 
+  
 </body>
+
+<script>
+  
+var width = 750;
+var height = 500;
+
+var projection = d3.geo.albersUsa()
+    .scale(800)
+    .translate([width / 2, height / 2]);
+
+var path = d3.geo.path()
+    .projection(projection);
+
+var svg = d3.select("#mvp-picker").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("class", "map");
+
+d3.json("us.json", function(error, us) {
+  if (error) throw error;
+
+  svg.insert("path", ".graticule")
+      .datum(topojson.feature(us, us.objects.land))
+      .attr("class", "land")
+      .attr("d", path);
+
+  svg.insert("path", ".graticule")
+      .datum(topojson.mesh(us, us.objects.counties, function(a, b) { return a !== b && !(a.id / 1000 ^ b.id / 1000); }))
+      .attr("class", "county-boundary")
+      .attr("d", path);
+
+  svg.insert("path", ".graticule")
+      .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+      .attr("class", "state-boundary")
+      .attr("d", path);
+});
+  
+  
+</script>
 </html>
