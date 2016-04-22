@@ -7,6 +7,7 @@ body {
 	text-align: center;
 }
 
+/*
 .land {
   fill: #12bd00;
   opacity: .5;
@@ -26,6 +27,34 @@ body {
 
 .map {
 	background: lightblue;
+}
+*/
+
+svg {
+  background: lightblue;
+}
+
+.sphere {
+  fill: lightblue;
+}
+
+.land {
+  fill: #12bd00;
+  opacity: .5;
+  stroke: lightblue;
+}
+
+.boundary {
+  fill: none;
+  stroke: lightblue;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
 }
 
 .container {
