@@ -7,30 +7,7 @@ body {
 	text-align: center;
 }
 
-/*
-.land {
-  fill: #12bd00;
-  opacity: .5;
-  stroke: lightblue;
-}
-
-.county-boundary {
-  fill: none;
-  stroke: none;
-  stroke-width: .5px;
-}
-
-.state-boundary {
-  fill: none;
-  stroke: lightblue;
-}
-
-.map {
-	background: lightblue;
-}
-*/
-
-svg {
+#mvp-picker {
   background: lightblue;
 }
 
@@ -73,4 +50,25 @@ svg {
 #title {
 	background: black;
 	color: white;
+}
+
+div.tooltip { 
+      position: absolute;     
+      text-align: left;     
+      width: 330px;         
+      height: 150px;          
+      padding: 5px;       
+      font: 12px sans-serif;    
+      background: #596375;
+	  color: white;
+      border: 0px;    
+      border-radius: 8px;     
+      pointer-events: none;     
+    }
+div.tooltip img {
+	padding: 5px;
+}
+div.tooltip h4 {
+	margin: 0;
+	padding-top: 5px;
 }
