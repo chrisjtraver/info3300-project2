@@ -93,8 +93,8 @@ function zoomed() {
   g.selectAll("path")
       .attr("d", path);
 
-  svg.selectAll("circle").attr("cx", function(d) {return projection([d.Longitude, d.Latitude])[0]})
-  .attr("cy", function(d) {return projection([d.Longitude, d.Latitude])[1]})
+  svg.selectAll("image").attr("x", function(d) {return projection([d.Longitude, d.Latitude])[0]})
+  .attr("y", function(d) {return projection([d.Longitude, d.Latitude])[1]})
 }
 
 d3.select(self.frameElement).style("height", height + "px");
@@ -108,12 +108,25 @@ d3.csv("mvp_list.csv", function (error, rows) {
   var playerPoints = svg.selectAll(".playerPoints").data(mvp_data);
   
   playerPoints
-  .enter().append("circle")
-  .attr("cx", function(d) {return projection([d.Longitude, d.Latitude])[0]})
-  .attr("cy", function(d) {return projection([d.Longitude, d.Latitude])[1]})
-  .attr("r", 5)
-  .style("fill","red")
-  .style("opacity", '0.4');
+    .enter().append("image")
+    .attr("x", function(d) {return projection([d.Longitude, d.Latitude])[0]})
+    .attr("y", function(d) {return projection([d.Longitude, d.Latitude])[1]})
+    .attr("width", 20)
+    .attr("height", 20)
+    .attr("xlink:href", function (d) {
+          if (d.League == "NL" || d.League == "AL") {
+              return "resources/images/mlb.png";
+          }                  
+          if (d.League == "NHL") {
+              return "resources/images/nhl.png";
+          }
+          if (d.League == "NBA") {
+              return "resources/images/nba.png";
+          }
+          if (d.League == "NFL") {
+              return "resources/images/nfl.png";
+          }
+    });
 
   playerPoints.on('mouseover',function(){
 				playerPoints.style("opacity",'0.7');
