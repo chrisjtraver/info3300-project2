@@ -8,9 +8,21 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"> <!-- Import Bootstrap -->
   <script src="http://d3js.org/topojson.v1.min.js"></script> <!-- Import map JSON -->
 </head>
-
+<style>
+div.tooltip { 
+      position: absolute;     
+      text-align: center;     
+      width: 155px;         
+      height: 130px;          
+      padding: 5px;       
+      font: 12px sans-serif;    
+      background: lightsteelblue; 
+      border: 0px;    
+      border-radius: 8px;     
+      pointer-events: none;     
+    }
+</style>
 <body>
-
 <div class="container">
     <div class="row title-row">
         <div class="col-xs-12" id="title">
@@ -30,7 +42,7 @@
         <div class="col-xs-12" id="overall-stats"></div>
     </div>
 </div> 
-  
+
 </body>
 
 <script>
@@ -44,7 +56,7 @@ var projection = d3.geo.mercator();
 var zoom = d3.behavior.zoom()
     .translate([width / 2, height / 2])
     .scale(scale0)
-    .scaleExtent([scale0, 8 * scale0])
+    .scaleExtent([scale0,   24 * scale0])
     .on("zoom", zoomed);
 
 var path = d3.geo.path()
@@ -56,6 +68,10 @@ var svg = d3.select("#mvp-picker").append("svg")
   .append("g");
 
 var g = svg.append("g");
+
+var tip = d3.select("#mvp-picker").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
 
 svg.append("rect")
     .attr("class", "overlay")
@@ -85,6 +101,21 @@ d3.json("world-110m.json", function(error, world) {
       .attr("d", path);
 });
 
+rightWidth = 500;
+rightHeight = 500;
+var rightWindow = d3.select("#mvp-stats").append("svg")
+    .attr("width", rightWidth)
+    .attr("height", rightHeight)
+  .append("g");
+
+rightWindow.append("text")
+            .text("Hello")
+            .attr("x", rightWidth/2)
+            .attr("text-anchor", "middle")
+            .attr("y", rightHeight*.1)
+            .attr("font-size", "50px")
+            .attr("id", "rightTitle");
+
 function zoomed() {
   projection
       .translate(zoom.translate())
@@ -103,14 +134,37 @@ var mvp_data;
 
 d3.csv("mvp_list.csv", function (error, rows) {
   
-  mvp_data = rows;
-  console.log(mvp_data);
+  mvp_data = rows;  
+  mvp_data_copy = [];
+  var set = new Set();
+  for(var k = 0; k < mvp_data.length; k++){
+    if(set.has(mvp_data[k].Player)){
+      // console.log("here");
+      continue;
+    }
+    else{
+      mvp_data_copy.push(mvp_data[k]);
+      // console.log(mvp_data[k].Player)
+      set.add(mvp_data[k].Player);
+    }
+  }
   var playerPoints = svg.selectAll(".playerPoints").data(mvp_data);
-  
-  playerPoints
+  var playerPointsNoDup = svg.selectAll(".playerPoints").data(mvp_data_copy);
+
+
+  playerPointsNoDup
     .enter().append("image")
-    .attr("x", function(d) {return projection([d.Longitude, d.Latitude])[0]})
-    .attr("y", function(d) {return projection([d.Longitude, d.Latitude])[1]})
+    .attr("x", function(d) {return projection([d.Longitude, d.Latitude])[0];})
+    .attr("y", function(d) {return projection([d.Longitude, d.Latitude])[1];})
+    .attr("name", function(d) {return d.Player;})
+    .attr("hometown", function(d) {return d.Hometown;})
+    .attr("age", function(d) {return d.Age;})
+    .attr("pheight", function(d) {return d.Height;})
+    .attr("weight", function(d) {return d.Weight;})
+    .attr("team", function(d) {return d.Team;})
+    .attr("college", function(d) {return d.College;})
+    .attr("salary", function(d) {return d.Salary;})
+    .attr("position", function(d) {return d.Position;})
     .attr("width", 20)
     .attr("height", 20)
     .attr("xlink:href", function (d) {
@@ -126,37 +180,66 @@ d3.csv("mvp_list.csv", function (error, rows) {
           if (d.League == "NFL") {
               return "resources/images/nfl.png";
           }
-    });
+    })
+    .style("opacity", "0.4");
 
-  playerPoints.on('mouseover',function(){
-				playerPoints.style("opacity",'0.7');
-			})
-  playerPoints.on('mouseout',function(){
-				playerPoints.style("opacity",'0.4');
-				
-			})
+  playerPointsNoDup.on('mouseover',function(){
+        var curr = d3.select(this);
+        curr.style("opacity", "0.7");
+        var name = curr.attr("name");
+        var age = curr.attr("age");
+        var hometown = curr.attr("hometown");
+        var salary = curr.attr("salary");
+        var weight = curr.attr("weight");
+        var playerHeight = curr.attr("pheight");
+        var team = curr.attr("team");
+        var college = curr.attr("college");
+        var position = curr.attr("position");
+        svg.append("text")
+          .text(name + ' - ' + hometown)
+          .attr("x", width/2)
+          .attr("text-anchor", "middle")
+          .attr("y", height*.95)
+          .style("font-size", "20px")
+          .attr("stroke","black")
+          .attr("id","playerLabel");
 
-  
+
+        tip.transition()    
+                .duration(200)    
+                .style("opacity", .9);    
+        tip.html("<strong>" + name + "</strong>" + "<br/>"  + 
+                  "Team: " + team + "<br/>" + 
+                  "Position: " + position + "<br/>" + 
+                  "Age: " + age + "<br/>" + 
+                  "Height: " + playerHeight + "<br/>" + 
+                  "Weight: " + weight + " pounds<br/>" +
+                  "College: " + college + "<br/>" + 
+                  "Salary: " + salary + "<br/>")
+            .style("left", (d3.event.pageX) + "px")   
+            .style("top", (d3.event.pageY - 28) + "px");  
+  })          
+            
+
+  playerPointsNoDup.on('mouseout',function(){
+				d3.select(this).style("opacity", "0.4");
+        svg.select("#playerLabel").remove();
+        tip.transition()    
+                .duration(500)    
+                .style("opacity", 0); 
+	})
+
+  playerPointsNoDup.on('click',function(){
+        var curr = d3.select(this);
+        var name = curr.attr("name");
+        rightWindow.select("#rightTitle")
+                    .text(name);
+
+  })
+
 });
 
 
 
-
-//mvp_data.forEach(function (player) {
-//  playe
-//});
-//Loop through dataset and plot circles
-/*for (i = 0; i < data.length; i++) {
-    var lonlat = [data[i].lon, data[i].lat];
-    var xy = projection(lonlat)
-    svg.append("circle")
-    .attr({
-      cx: xy[0],
-      cy: xy[1],
-      r: 4,
-      fill: gradientScale(data[i].price),
-    })
-    .attr("stroke", "black")
-}*/
 </script>
 </html>
