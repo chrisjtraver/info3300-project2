@@ -48,8 +48,8 @@ body {
 }
 
 #title {
-	background: black;
-	color: white;
+	background: white;
+	color: black;
 }
 
 div.tooltip { 
@@ -65,10 +65,39 @@ div.tooltip {
       border-radius: 8px;     
       pointer-events: none;     
     }
+	
 div.tooltip img {
 	padding: 5px;
 }
 div.tooltip h4 {
 	margin: 0;
 	padding-top: 5px;
+}
+
+
+#instructions { 
+/*      position: fixed;         
+      font: 12px sans-serif;    
+      background: #596375;  
+      pointer-events: none;
+	  margin-left: auto;
+	  margin-left: auto;*/
+	position: absolute;
+	text-align: center;
+	margin: auto;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 400px;
+	height: 300px;
+	background-color: #596375;
+	border-radius: 8px;
+	color: white;
+	opacity: 0.75;
+	padding: 10px;
+    }
+#instructions button {
+	fill: green;
+	color: black;
 }

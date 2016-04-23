@@ -13,13 +13,26 @@
 <div class="container">
     <div class="row title-row">
         <div class="col-xs-12" id="title">
-            <h1 class="center">MVP Comparison Tool</h1>
+            <h1 class="center">Master of MVPs</h1>
+            <h6 class="center">By Chris Traver, Rohit Biswas & Chris Vrabel</h6>
+            <p class="center">A data visualization of NBA, NHL, MLB, and NBA most valuable players (MVPs) between 2000-2015.</p>
         </div>
     </div>
 
-    <div class="row main-visualizations">
-        <div class="col-md-7" id="mvp-picker"></div>
-        <div class="col-md-5" id="mvp-stats"></div>
+    <div class="row interactive-map">
+        <div class="col-xs-12" id="mvp-picker"></div>
+        <div id="instructions">
+          <h3>Instructions</h3>
+          <p>Begin by selecting a point on the map below.  Different sports are represented by different icons, and the locations
+          of each icon represent the hometown of that MVP.</p>
+          <p>You can zoom and pan using your mouse and the scroll wheel.  You can also hover over a data point
+          to view bio information about that MVP.</p>
+          <p>Next, click on an icon to load it into the detailed visualization below the map.</p>
+          <button id="instructions-close">Lets go!</button>
+        </div>
+    </div>
+    <div class="player-visualizations">
+        <div class="col-xs-12" id="mvp-stats"></div>
     </div>
     <div class="row mvp-comparison-tool">
         <div class="col-md-6" id="compare-mvp1"></div>
@@ -34,7 +47,7 @@
 
 <script>
 
-var width = 750,
+var width = 1500,
     height = 500,
     scale0 = (width - 1) / 2 / Math.PI;
 
@@ -52,6 +65,7 @@ var path = d3.geo.path()
 var svg = d3.select("#mvp-picker").append("svg")
     .attr("width", width)
     .attr("height", height)
+    .attr("class", "map")
   .append("g");
 
 var g = svg.append("g");
@@ -59,7 +73,7 @@ var g = svg.append("g");
 var tip = d3.select("#mvp-picker").append("div")
             .attr("class", "tooltip")
             .style("opacity", 0);
-
+    
 svg.append("rect")
     .attr("class", "overlay")
     .attr("width", width)
@@ -86,7 +100,9 @@ d3.json("world-110m.json", function(error, world) {
       .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
       .attr("class", "boundary")
       .attr("d", path);
+
 });
+
 
 rightWidth = 500;
 rightHeight = 500;
@@ -226,7 +242,11 @@ d3.csv("mvp_list.csv", function (error, rows) {
                     .text(name);
 
   })
-
+  
+  d3.select("#instructions-close").on("click", function() {
+      d3.select("#instructions").remove();
+  });
+  
 });
 
 
