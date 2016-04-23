@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Season,League,Player,Age,Team,Position,Height,Weight,Hometown,College,Salary,Latitude,Longitude
 2015,NBA,Stephen Curry,26,GSW,PG,6.3,185,"Akron, OH",Davidson College,10629213,41.281445,-81.519005
 2014,NBA,Kevin Durant,25,OKC,"SF, SG",6.9,240,"Washington, DC",University of Texas at Austin,17832627,38.907192,-77.036871
@@ -79,3 +80,86 @@ Season,League,Player,Age,Team,Position,Height,Weight,Hometown,College,Salary,Lat
 2002,AL,Miguel Tejada,28,OAK,SS,5.9,220,"Bani, DR",High School Only,3625000,18.38548,-70.730117
 2001,AL,Ichiro Suzuki,27,SEA,OF,5.11,175,"Kasugai, Japan",High School Only,5666667,35.2779861,136.941133
 2000,AL,Jason Giambi,29,OAK,1B,6.3,240,"West Covina, CA",University of California at Long Beach,3103333,34.068621,-117.938953
+=======
+Season,League,Subleague,Player,Age,Team,Position,Height,Weight,Hometown,College,Salary,Latitude,Longitude
+2015,NBA,,Stephen Curry,26,GSW,PG,6.3,185,"Akron, OH",Davidson College,10629213,41.081445,-81.519005
+2014,NBA,,Kevin Durant,25,OKC,"SF, SG",6.9,240,"Washington, DC",University of Texas at Austin,17832627,38.907192,-77.036871
+2013,NBA,,LeBron James,28,MIA,"SF, PF, SG",6.8,250,"Akron, OH",High School Only,19067500,41.081445,-81.519005
+2012,NBA,,LeBron James,27,MIA,"SF, PF, SG",6.8,250,"Akron, OH",High School Only,17545000,41.081445,-81.519005
+2011,NBA,,Derrick Rose,22,CHI,PG,6.3,190,"Chicago, IL",University of Memphis,5546160,41.878114,-87.629798
+2010,NBA,,LeBron James,25,CLE,"SF, PF, SG",6.8,250,"Akron, OH",High School Only,15779912,41.081445,-81.519005
+2009,NBA,,LeBron James,24,CLE,"SF, PF, SG",6.8,250,"Akron, OH",High School Only,14410581,41.081445,-81.519005
+2008,NBA,,Kobe Bryant,29,LAL,"SG, SF",6.6,212,"Philadelpia, PA",High School Only,19490625,39.952584,-75.165222
+2007,NBA,,Dirk Nowitzki,28,DAL,"PF, C",7,245,"Murzburg, Germany",High School Only,15101622,49.791304,9.953355
+2006,NBA,,Steve Nash,31,PHO,PG,6.3,195,"Johannesburg, South Africa",Santa Clara University,9625000,-26.204103,28.047305
+2005,NBA,,Steve Nash,30,PHO,PG,6.3,195,"Johannesburg, South Africa",Santa Clara University,5750000,-26.204103,28.047305
+2004,NBA,,Kevin Garnett,27,MIN,"PF, C, SF",6.11,240,"Mauldin, SC",High School Only,28000000,34.77873,-82.310119
+2003,NBA,,Tim Duncan,26,SAS,"PF, C",6.11,250,"St. Croix, U.S Virgin Islands",Wake Forest University,12072000,17.724597,-64.834799
+2002,NBA,,Tim Duncan,25,SAS,"PF, C",6.11,250,"St. Croix, U.S Virgin Islands",Wake Forest University,10865000,17.724597,-64.834799
+2001,NBA,,Allen Iverson,25,PHI,"SG, PG",6,165,"Hampton, VA",Georgetown University,10130000,37.029869,-76.345222
+2000,NBA,,Shaquille O'Neal,27,LAL,C,7.1,325,"Newark, NJ",Louisiana State University,17142858,40.735657,-74.172367
+2015,NFL,,Cam Newton,33,CP,QB,6.6,260,"College Park, GA",Auburn University,13000000,33.653443,-84.449372
+2014,NFL,,Aaron Rodgers,31,GBP,QB,6.2,223,"Chico, CA",University of California at Berkeley,17550000,39.728494,-121.837478
+2013,NFL,,Peyton Manning,37,DB,QB,6.5,230,"New Orleans, LA",University of Tennessee,17500000,29.951066,-90.071532
+2012,NFL,,Adrian Peterson,27,MV,RB,6.2,217,"Palestine, TX",Oklahoma State University,12705000,31.762115,-95.630789
+2011,NFL,,Aaron Rodgers,28,GBP,QB,6.2,223,"Chico, CA",University of California at Berkeley,7750000,39.728494,-121.837478
+2010,NFL,,Tom Brady,33,NEP,QB,6.4,225,"San Mateo, CA",University of Michigan,17320000,37.562992,-122.325525
+2009,NFL,,Peyton Manning,33,IC,QB,6.5,230,"New Orleans, LA",University of Tennessee,23216666,29.951066,-90.071532
+2008,NFL,,Peyton Manning,32,IC,QB,6.5,230,"New Orleans, LA",University of Tennessee,20716666,29.951066,-90.071532
+2007,NFL,,Tom Brady,30,NEP,QB,6.4,225,"San Mateo, CA",University of Michigan,7340000,37.562992,-122.325525
+2006,NFL,,LaDainian Tomlinson,27,SDC,RB,5.1,221,"Rosebud, TX",Texas Christian University,7350000,31.072961,-96.978599
+2005,NFL,,Shaun Alexander,28,SS,RB,5.11,225,"Florence, KY",Alabama State University,6323000,38.99895,-84.626611
+2004,NFL,,Peyton Manning,28,IC,QB,6.5,230,"New Orleans, LA",University of Tennessee,6285000,29.951066,-90.071532
+2003,NFL,,Peyton Manning,27,IC,QB,6.5,230,"New Orleans, LA",University of Tennessee,15375333,29.951066,-90.071532
+2003,NFL,,Steve McNair,30,TT,QB,6.2,235,"Mount Olive, MS",Alcorn State University,5819167,31.761274,-89.655072
+2002,NFL,,Rich Gannon,37,OR,QB,6.3,210,"Philadelpia, PA",Delaware University,3714285,39.952584,-75.165222
+2001,NFL,,Kurt Warner,30,SLR,QB,6.2,220,"Burlington, IA",Northern Iowa University,2334523,40.807653,-91.11289
+2000,NFL,,Marshall Faulk,27,SLR,RB,5.1,211,"New Orleans, LA",San Diego State University,2440000,29.951066,-90.071532
+2015,NHL,,Carey Price,27,MTL,G,6.3,216,"Anahim Lake, British Columbia",High School Only,6500000,52.466667,-125.316667
+2014,NHL,,Sidney Crosby,26,PIT,C,5.11,200,"Cole Harbour, Nova Scotia",High School Only,8700000,44.645815,-63.453445
+2013,NHL,,Alex Ovechkin,27,WSH,RW,6.3,239,"Moscow, Russia",High School Only,9538462,55.755826,37.6173
+2012,NHL,,Evgeni Malkin,25,PIT,C,6.3,195,"Magnitogorsk, Russia",High School Only,8700000,53.412943,59.001623
+2011,NHL,,Corey Perry,25,ANA,RW,6.3,210,"Peterborough, Ontario",High School Only,5325000,44.309058,-78.319747
+2010,NHL,,Henrik Sedin,29,VAN,C,6.2,188,"Ornskoldsvik, Sweden",High School Only,6100000,63.290047,18.716617
+2009,NHL,,Alex Ovechkin,23,WSH,LW,6.3,239,"Moscow, Russia",High School Only,9538462,55.755826,37.6173
+2008,NHL,,Alex Ovechkin,22,WSH,LW,6.3,239,"Moscow, Russia",High School Only,984200,55.755826,37.6173
+2007,NHL,,Sidney Crosby,19,PIT,C,5.11,200,"Cole Harbour, Nova Scotia",High School Only,3700000,44.645815,-63.453445
+2006,NHL,,Joe Thornton,26,TOT,C,6.4,220,"London, Ontario",High School Only,6666667,42.98695,-81.243177
+2004,NHL,,Martin St. Louis,28,TBL,RW,5.8,180,"Laval, Quebec",High School Only,1250000,45.606649,-73.712409
+2003,NHL,,Peter Forsberg,29,COL,C,6,205,"Ornskoldsvik, Sweden",High School Only,9500000,63.290047,18.716617
+2002,NHL,,Jose Theodore,25,MTL,G,5.11,172,"Laval, Quebec",High School Only,1650000,45.606649,-73.712409
+2001,NHL,,Joe Sakic,31,COL,C,5.11,195,"Burnaby, British Columbia",High School Only,7900000,49.248809,-122.98051
+2000,NHL,,Chris Pronger,25,STL,D,6.6,220,"Dryden, Ontario",High School Only,4941429,49.780094,-92.836959
+2015,MLB,NL,Bryce Harper,22,WSN,OF,6.3,215,"Las Vegas, NV",High School Only,2500000,36.169941,-115.13983
+2014,MLB,NL,Clayton Kershaw,26,LAD,P,6.4,225,"Dallas, TX",High School Only,6571428,32.776664,-96.796988
+2013,MLB,NL,Andrew McCutchen,26,PIT,OF,5.1,190,"Fort Meade, FL",High School Only,4858333,27.752253,-81.801749
+2012,MLB,NL,Buster Posey,25,SFG,C,6.1,215,"Leesburg, GA",Florida State University,615000,31.732116,-84.170742
+2011,MLB,NL,Ryan Braun,27,MIL,OF,6.2,205,"Mission Hills, CA",University of Miami,13025900,34.688246,-120.436421
+2010,MLB,NL,Joey Votto,26,CIN,1B,6.2,220,"Toronto, Ontario",High School Only,525000,43.653226,-79.383184
+2009,MLB,NL,Albert Pujols,29,STL,1B,6.3,240,"Santo Domingo, DR",Maple Woods Community College,16300000,18.486058,-69.931212
+2008,MLB,NL,Albert Pujols,28,STL,1B,6.3,240,"Santo Domingo, DR",Maple Woods Community College,16300000,18.486058,-69.931212
+2007,MLB,NL,Jimmy Rollins,28,PHI,SS,5.7,175,"Oakland, CA",High School Only,8050000,37.804364,-122.271114
+2006,MLB,NL,Ryan Howard,26,PHI,1B,6.4,240,"St. Louis, MO",Missouri State University,355000,38.627003,-90.199404
+2005,MLB,NL,Albert Pujols,25,STL,1B,6.3,240,"Santo Domingo, DR",Maple Woods Community College,11250000,18.486058,-69.931212
+2004,MLB,NL,Barry Bonds,39,SFG,OF,6.1,185,"Riverside, CA",Arizona State University,22000000,33.953349,-117.396156
+2003,MLB,NL,Barry Bonds,38,SFG,OF,6.1,185,"Riverside, CA",Arizona State University,22000000,33.953349,-117.396156
+2002,MLB,NL,Barry Bonds,37,SFG,OF,6.1,185,"Riverside, CA",Arizona State University,22000000,33.953349,-117.396156
+2001,MLB,NL,Barry Bonds,36,SFG,OF,6.1,185,"Riverside, CA",Arizona State University,22000000,33.953349,-117.396156
+2000,MLB,NL,Jeff Kent,32,SFG,2B,6.1,185,"Bellflower, CA",University of California at Berkeley,6000000,33.881682,-118.117012
+2015,MLB,AL,Josh Donaldson,29,TOR,3B,6.1,210,"Pensacola, FL",Auburn University,4300000,30.421309,-87.216915
+2014,MLB,AL,Mike Trout,22,LAA,OF,6.2,235,"Vineland, NJ",High School Only,1000000,39.486377,-75.025964
+2013,MLB,AL,Miguel Cabrera,30,DET,3B,6.4,240,"Maracay, Venezuela",High School Only,21000000,10.244193,-67.606616
+2012,MLB,AL,Miguel Cabrera,29,DET,3B,6.4,240,"Maracay, Venezuela",High School Only,21000000,10.244193,-67.606616
+2011,MLB,AL,Justin Verlander,28,DET,P,6.5,225,"Manakin Sabot, VA",Old Dominion University,13250000,37.65203,-77.723131
+2010,MLB,AL,Josh Hamilton,29,TEX,OF,6.4,240,"Raleigh, NC",High School Only,3250000,35.77959,-78.638179
+2009,MLB,AL,Joe Mauer,26,MIN,C,6.5,225,"St. Paul, MN",High School Only,10675000,44.953703,-93.089958
+2008,MLB,AL,Dustin Pedroia,24,BOS,2B,5.9,175,"Woodland, CA",Arizona State University,457000,38.678516,-121.773297
+2007,MLB,AL,Alex Rodriguez,31,NYY,3B,6.3,230,"New York, NY",High School Only,22708525,40.712784,-74.005941
+2006,MLB,AL,Justin Morneau,25,MIN,1B,6.4,220,"New Westminster, BC",High School Only,4500000,49.205718,-122.910956
+2005,MLB,AL,Alex Rodriguez,29,NYY,3B,6.3,230,"New York, NY",High School Only,26000000,40.712784,-74.005941
+2004,MLB,AL,Vladimir Guerrero,29,ANA,OF,6.3,235,"Nizao, DR",High School Only,11000000,18.244409,-70.197673
+2003,MLB,AL,Alex Rodriguez,27,TEX,SS,6.3,230,"New York, NY",High School Only,22000000,40.712784,-74.005941
+2002,MLB,AL,Miguel Tejada,28,OAK,SS,5.9,220,"Bani, DR",High School Only,3625000,18.28548,-70.330117
+2001,MLB,AL,Ichiro Suzuki,27,SEA,OF,5.11,175,"Kasugai, Japan",High School Only,5666667,35.2779861,136.941133
+2000,MLB,AL,Jason Giambi,29,OAK,1B,6.3,240,"West Covina, CA",University of California at Long Beach,3103333,34.068621,-117.938953
+>>>>>>> 95d0cfc43707b979e448661d58d303e8dc6f3340
