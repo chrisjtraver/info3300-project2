@@ -8,20 +8,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"> <!-- Import Bootstrap -->
   <script src="http://d3js.org/topojson.v1.min.js"></script> <!-- Import map JSON -->
 </head>
-<style>
-div.tooltip { 
-      position: absolute;     
-      text-align: center;     
-      width: 155px;         
-      height: 130px;          
-      padding: 5px;       
-      font: 12px sans-serif;    
-      background: lightsteelblue; 
-      border: 0px;    
-      border-radius: 8px;     
-      pointer-events: none;     
-    }
-</style>
+
 <body>
 <div class="container">
     <div class="row title-row">
@@ -168,7 +155,7 @@ d3.csv("mvp_list.csv", function (error, rows) {
     .attr("width", 20)
     .attr("height", 20)
     .attr("xlink:href", function (d) {
-          if (d.League == "NL" || d.League == "AL") {
+          if (d.League == "MLB") {
               return "resources/images/mlb.png";
           }                  
           if (d.League == "NHL") {
@@ -204,18 +191,20 @@ d3.csv("mvp_list.csv", function (error, rows) {
           .attr("stroke","black")
           .attr("id","playerLabel");
 
-
+        name.split(' ').join('_')
         tip.transition()    
                 .duration(200)    
                 .style("opacity", .9);    
-        tip.html("<strong>" + name + "</strong>" + "<br/>"  + 
-                  "Team: " + team + "<br/>" + 
-                  "Position: " + position + "<br/>" + 
-                  "Age: " + age + "<br/>" + 
-                  "Height: " + playerHeight + "<br/>" + 
-                  "Weight: " + weight + " pounds<br/>" +
-                  "College: " + college + "<br/>" + 
-                  "Salary: " + salary + "<br/>")
+        tip.html("<img src='resources/images/player-photos/" + name.toLowerCase().split(' ').join('_') + ".jpg'" +
+                  "style='float: left;',  height=140, width=120> <h4>"
+                  + name + "</h4>" + "<br/>"  + 
+                  "<strong><u>Team:</u></strong>  " + team + "<br/>" + 
+                  "<strong><u>Position:</u></strong>  " + position + "<br/>" + 
+                  "<strong><u>Age:</u></strong>  " + age + "<br/>" + 
+                  "<strong><u>Height:</u></strong>  " + playerHeight + "<br/>" + 
+                  "<strong><u>Weight:</u></strong>  " + weight + " lbs<br/>" +
+                  "<strong><u>College:</u></strong>  " + college + "<br/>" + 
+                  "<strong><u>Salary:</u></strong>  $" + salary + "<br/>")
             .style("left", (d3.event.pageX) + "px")   
             .style("top", (d3.event.pageY - 28) + "px");  
   })          
