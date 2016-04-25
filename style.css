@@ -7,11 +7,7 @@ body {
 	text-align: center;
 }
 
-#mvp-picker {
-  background: lightblue;
-  overflow: hidden;
-}
-
+/*Map Styles*/
 .sphere {
   fill: lightblue;
 }
@@ -34,13 +30,20 @@ body {
   fill: none;
   pointer-events: all;
 }
+/* END-Map Styles*/
 
+/*Section Styles*/
 .container {
 	width: 100% !important; 
 	padding-right: 0px !important;
     padding-left: 0px !important;
     margin-right: 0 !important;
     margin-left: 0 !important;
+}
+
+#mvp-picker {
+  background: lightblue;
+  overflow: hidden;
 }
 
 #mvp-stats {
@@ -78,18 +81,13 @@ div.tooltip h4 {
 
 
 #instructions { 
-/*      position: fixed;         
-      font: 12px sans-serif;    
-      background: #596375;  
-      pointer-events: none;
-	  margin-left: auto;
-	  margin-left: auto;*/
 	position: absolute;
 	text-align: center;
 	margin: auto;
+	margin-top: 220px; /*change this to adjust vertical position of instructions*/
 	top: 0;
 	right: 0;
-	bottom: 0;
+	bottom: 0; 
 	left: 0;
 	width: 400px;
 	height: 300px;
@@ -99,7 +97,27 @@ div.tooltip h4 {
 	opacity: 0.75;
 	padding: 10px;
     }
+	
 #instructions button {
 	fill: green;
 	color: black;
+}
+
+div.scatterplot-tooltip {	
+  position: absolute;			
+  text-align: center;			
+  width: 100px;					
+  height: 110px;					
+  padding: 5px;				
+  font: 12px sans-serif;		
+  background: lightsteelblue;	
+  border: 0px;		
+  border-radius: 8px;			
+  pointer-events: none;			
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }

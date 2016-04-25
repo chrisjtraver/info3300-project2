@@ -18,7 +18,6 @@
             <p class="center">A data visualization of NBA, NHL, MLB, and NBA most valuable players (MVPs) between 2000-2015.</p>
         </div>
     </div>
-
     <div class="row interactive-map">
         <div class="col-xs-12" id="mvp-picker"></div>
         <div id="instructions">
@@ -34,12 +33,16 @@
     <div class="row player-visualizations">
         <div class="col-xs-12" id="mvp-stats"></div>
     </div>
-    <div class="row mvp-comparison-tool">
-        <div class="col-md-6" id="compare-mvp1"></div>
-        <div class="col-md-6" id="compare-mvp2"></div>
+    <div class="row overall-stats-title">
+        <div class="col-xs-12" >
+                <h2 class="center">Overall Statistics</h2>
+                <p class="center">There are many surprising commonalities between NHL, NBA, MLB, and NFL most valuable players.  Here
+                is a breakdown of some interesting trends.</p>
+        </div>
     </div>
-    <div class="row overall-mvp-stats">
-        <div class="col-xs-12" id="overall-stats"></div>
+    <div class="row overall-stats">
+        <div class="col-md-6 scatterplot"></div>
+        <div class="col-md-6" id="histogram"></div>
     </div>
 </div> 
 
@@ -47,7 +50,7 @@
 
 <script>
 
-var width = 2000,
+var width = 1600,
     height = 500,
     scale0 = (width - 1) / 2 / Math.PI;
 
@@ -83,7 +86,7 @@ svg
     .call(zoom)
     .call(zoom.event);
 
-d3.json("world-110m.json", function(error, world) {
+d3.json("resources/world-110m.json", function(error, world) {
   if (error) throw error;
 
   g.append("path")
@@ -135,26 +138,65 @@ d3.select(self.frameElement).style("height", height + "px");
 
 var mvp_data;
 
-d3.csv("mvp_list.csv", function (error, rows) {
+d3.csv("data/mvp_list.csv", function (error, rows) {
   
-  mvp_data = rows;  
-  mvp_data_copy = [];
-  var set = new Set();
-  for(var k = 0; k < mvp_data.length; k++){
-    if(set.has(mvp_data[k].Player)){
-      // console.log("here");
-      continue;
+  mvp_data = rows;
+  
+  function remove_duplicates(c) {
+    mvp_data = rows;
+    mvp_data_copy = [];
+    var set = new Set();
+    
+    if (c=="College") {
+            for(var k = 0; k < mvp_data.length; k++){
+              if(set.has(mvp_data[k].College)){
+                continue;
+              }
+              else{
+                mvp_data_copy.push(mvp_data[k]);
+                set.add(mvp_data[k].College);
+              }
+            }        
     }
-    else{
-      mvp_data_copy.push(mvp_data[k]);
-      // console.log(mvp_data[k].Player)
-      set.add(mvp_data[k].Player);
+    if (c=="Player") {
+            for(var k = 0; k < mvp_data.length; k++){
+              if(set.has(mvp_data[k].Player)){
+                continue;
+              }
+              else{
+                mvp_data_copy.push(mvp_data[k]);
+                set.add(mvp_data[k].Player);
+              }
+            }        
     }
+    if (c=="Team") {
+            for(var k = 0; k < mvp_data.length; k++){
+              if(set.has(mvp_data[k].Team)){
+                continue;
+              }
+              else{
+                mvp_data_copy.push(mvp_data[k]);
+                set.add(mvp_data[k].Team);
+              }
+            }        
+    }
+    if (c=="Hometown") {
+            for(var k = 0; k < mvp_data.length; k++){
+              if(set.has(mvp_data[k].Hometown)){
+                continue;
+              }
+              else{
+                mvp_data_copy.push(mvp_data[k]);
+                set.add(mvp_data[k].Hometown);
+              }
+            }        
+    }
+
+    return mvp_data_copy;
   }
-  var playerPoints = svg.selectAll(".playerPoints").data(mvp_data);
-  var playerPointsNoDup = svg.selectAll(".playerPoints").data(mvp_data_copy);
 
-
+  var playerPointsNoDup = svg.selectAll(".playerPoints").data(remove_duplicates("Player"));
+  
   playerPointsNoDup
     .enter().append("image")
     .attr("x", function(d) {return projection([d.Longitude, d.Latitude])[0];})
@@ -170,6 +212,7 @@ d3.csv("mvp_list.csv", function (error, rows) {
     .attr("position", function(d) {return d.Position;})
     .attr("width", 20)
     .attr("height", 20)
+    .style("opacity", "0.4")
     .attr("xlink:href", function (d) {
           if (d.League == "MLB") {
               return "resources/images/mlb.png";
@@ -183,8 +226,7 @@ d3.csv("mvp_list.csv", function (error, rows) {
           if (d.League == "NFL") {
               return "resources/images/nfl.png";
           }
-    })
-    .style("opacity", "0.4");
+    });
 
   playerPointsNoDup.on('mouseover',function(){
         var curr = d3.select(this);
@@ -226,7 +268,6 @@ d3.csv("mvp_list.csv", function (error, rows) {
             .style("top", (d3.event.pageY - 28) + "px");  
   })          
             
-
   playerPointsNoDup.on('mouseout',function(){
 				d3.select(this).style("opacity", "0.4");
         svg.select("#playerLabel").remove();
@@ -247,6 +288,106 @@ d3.csv("mvp_list.csv", function (error, rows) {
       d3.select("#instructions").remove();
   });
   
+  var margin = {top: 100, right: 100, bottom: 100, left: 100},
+  width = 600 - margin.left - margin.right,
+  height = 500 - margin.top - margin.bottom;
+
+  var x = d3.scale.linear()
+    .range([0, width]);
+
+  var y = d3.scale.linear()
+    .range([height, 0]);
+
+  var color = d3.scale.category10();
+
+  var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+  var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+  var scatterplot = d3.select(".scatterplot").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // Define the div for the tooltip
+  var div = d3.select(".scatterplot").append("div")	
+    .attr("class", "scatterplot-tooltip")				
+    .style("opacity", 0);
+    
+  x.domain(d3.extent(rows, function(d) { return Number(d.Age); })).nice();
+  y.domain(d3.extent(rows, function(d) { return Number(d.Salary); })).nice();
+
+  scatterplot.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("x", width)
+      .attr("y", -6)
+      .style("text-anchor", "end")
+      .text("Age (yrs)");
+
+  scatterplot.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Salary ($)")
+
+  format = d3.format("0,000");
+
+  var dots = scatterplot.selectAll(".dot")
+      .data(mvp_data)
+    .enter().append("circle")
+      .attr("class", function(d) { return "dot " + d.Team + " " + d.College.split(' ').join('_')})
+      .attr("r", 3.5)
+      .attr("cx", function(d) { return x(Number(d.Age)); })
+      .attr("cy", function(d) { return y(Number(d.Salary)); })
+      .style("fill", function(d) { return color(d.League); })
+      .on("mouseover", function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div.html("<strong>" + d.Player + "</strong>" + "<br/><br/>"  + "At " + d.Age + " years old " + "his salary was " + "$" + format(d.Salary))	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+
+
+  var legend = scatterplot.selectAll(".legend")
+      .data(color.domain())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend.append("rect")
+      .attr("x", width - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+
+  legend.append("text")
+      .attr("x", width - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+      
 });
 
 
