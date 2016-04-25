@@ -9,6 +9,7 @@ body {
 
 #mvp-picker {
   background: lightblue;
+  overflow: hidden;
 }
 
 .sphere {
@@ -45,6 +46,7 @@ body {
 #mvp-stats {
 	background: #e1e1e1;
 	height: 500px;
+	overflow: visible;
 }
 
 #title {
@@ -63,7 +65,7 @@ div.tooltip {
 	  color: white;
       border: 0px;    
       border-radius: 8px;     
-      pointer-events: none;     
+      pointer-events: none;
     }
 	
 div.tooltip img {
