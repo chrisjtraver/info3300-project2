@@ -288,8 +288,8 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
       d3.select("#instructions").remove();
   });
   
-  var margin = {top: 100, right: 100, bottom: 100, left: 100},
-  width = 600 - margin.left - margin.right,
+  var margin = {top: 100, right: 100, bottom: 100, left: 150},
+  width = 1260 - margin.left - margin.right,
   height = 500 - margin.top - margin.bottom;
 
   var x = d3.scale.linear()
@@ -355,18 +355,29 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
       .attr("cy", function(d) { return y(Number(d.Salary)); })
       .style("fill", function(d) { return color(d.League); })
       .on("mouseover", function(d) {		
-            div.transition()		
-                .duration(200)		
-                .style("opacity", .9);		
-            div.html("<strong>" + d.Player + "</strong>" + "<br/><br/>"  + "At " + d.Age + " years old " + "his salary was " + "$" + format(d.Salary))	
-                .style("left", (d3.event.pageX) + "px")		
-                .style("top", (d3.event.pageY - 28) + "px");	
-            })					
+            d.Player.split(' ').join('_')
+            tip.transition()    
+                    .duration(200)    
+                    .style("opacity", .9);    
+            tip.html("<img src='resources/images/player-photos/" + d.Player.toLowerCase().split(' ').join('_') + ".jpg'" +
+                      "style='float: left;',  height=160, width=130> <h4>"
+                      + d.Player + "</h4>" + "<br/>"  +
+                      "<strong><u>Hometown:</u></strong>  " + d.Hometown + "<br/>" + 
+                      "<strong><u>Team:</u></strong>  " + d.Team + "<br/>" + 
+                      "<strong><u>Position:</u></strong>  " + d.Position + "<br/>" + 
+                      "<strong><u>Age:</u></strong>  " + d.Age + "<br/>" + 
+                      "<strong><u>Height:</u></strong>  " + d.Height + "<br/>" + 
+                      "<strong><u>Weight:</u></strong>  " + d.Weight + " lbs<br/>" +
+                      "<strong><u>College:</u></strong>  " + d.College + "<br/>" + 
+                      "<strong><u>Salary:</u></strong>  $" + d.Salary + "<br/>")
+                .style("left", (d3.event.pageX) + "px")   
+                .style("top", (d3.event.pageY - 28) + "px");
+      })
         .on("mouseout", function(d) {		
-            div.transition()		
+            tip.transition()		
                 .duration(500)		
                 .style("opacity", 0);	
-        });
+      });
 
 
   var legend = scatterplot.selectAll(".legend")
