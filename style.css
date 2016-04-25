@@ -121,3 +121,8 @@ div.scatterplot-tooltip {
   stroke: #000;
   shape-rendering: crispEdges;
 }
+
+.scatterplot-dropdowns {
+	text-align: center;
+	padding: 10px;
+}

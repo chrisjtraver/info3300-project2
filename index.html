@@ -41,8 +41,12 @@
         </div>
     </div>
     <div class="row overall-stats">
-        <div class="col-md-6 scatterplot"></div>
-        <div class="col-md-6" id="histogram"></div>
+        <div class="col-xs-12 scatterplot-dropdowns">
+          <span><strong>Sort By College: </strong></span><span class="college-dropdown"></span>
+          <span><strong>Sort By Team: </strong></span><span class="team-dropdown"></span>
+        </div>
+        <div class="col-xs-12 scatterplot"></div>
+        <div class="col-xs-12 histogram"></div>
     </div>
 </div> 
 
@@ -240,14 +244,14 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         var team = curr.attr("team");
         var college = curr.attr("college");
         var position = curr.attr("position");
-        svg.append("text")
-          .text(name + ' - ' + hometown)
-          .attr("x", width/2)
-          .attr("text-anchor", "middle")
-          .attr("y", height*.95)
-          .style("font-size", "20px")
-          .attr("stroke","black")
-          .attr("id","playerLabel");
+        //svg.append("text")
+        //  .text(name + ' - ' + hometown)
+        //  .attr("x", width/2)
+        //  .attr("text-anchor", "middle")
+        //  .attr("y", height*.95)
+        //  .style("font-size", "20px")
+        //  .attr("stroke","black")
+        //  .attr("id","playerLabel");
 
         name.split(' ').join('_')
         tip.transition()    
@@ -288,7 +292,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
       d3.select("#instructions").remove();
   });
   
-  var margin = {top: 100, right: 100, bottom: 100, left: 150},
+  var margin = {top: 20, right: 100, bottom: 100, left: 150},
   width = 1260 - margin.left - margin.right,
   height = 500 - margin.top - margin.bottom;
 
@@ -398,7 +402,30 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
       .attr("dy", ".35em")
       .style("text-anchor", "end")
       .text(function(d) { return d; });
-      
+   
+  var collegedropDown = d3.select(".college-dropdown").append("select")
+                    .attr("name", "college-list");
+  var teamdropDown = d3.select(".team-dropdown").append("select")
+                    .attr("name", "team-list");
+  
+  var collegeoptions = collegedropDown.selectAll("option")
+           .data(remove_duplicates("College"))
+         .enter()
+           .append("option");
+  var teamoptions = teamdropDown.selectAll("option")
+           .data(remove_duplicates("Team"))
+         .enter()
+           .append("option");
+           
+  collegeoptions.text(function (d) { return d.College; })
+       .attr("value", function (d) { return d.College.split(' ').join('_'); });
+  teamoptions.text(function (d) { return d.Team; })
+       .attr("value", function (d) { return d.Team; });
+       
+       
+  //var newData = mvp_data.filter( function(d) { return d.College == "Davidson College"; } );
+  //dots.data(newData);
+  //dots.exit().remove();   
 });
 
 
