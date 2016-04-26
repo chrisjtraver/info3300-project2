@@ -7,6 +7,14 @@ body {
 	text-align: center;
 }
 
+.left {
+	text-align: left;
+	margin-left:5%;
+}
+
+.blue {
+	color: #95b9c6;
+}
 /*Map Styles*/
 .sphere {
   fill: lightblue;
@@ -120,4 +128,9 @@ div.scatterplot-tooltip {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
+}
+
+.scatterplot-dropdowns {
+	text-align: center;
+	padding: 10px;
 }

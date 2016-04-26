@@ -41,8 +41,16 @@
         </div>
     </div>
     <div class="row overall-stats">
-        <div class="col-md-6 scatterplot"></div>
-        <div class="col-md-6" id="histogram"></div>
+        <div class="col-xs-12 scatterplot-dropdowns">
+          <h3 class="blue">Age & Salary Comparison</h3>
+          <p>This graph explores the relationship between salary and a player's age at the time they were awarded MVP.
+          <br>Hover over a datapoint to learn more about that MVP.</p><br>
+          <span><strong>Filter By College: </strong></span><span class="college-dropdown"></span>
+          <span><strong>Filter By Team: </strong></span><span class="team-dropdown"></span>
+          <span><strong>Filter By Sport: </strong></span><span class="sport-dropdown"></span>
+        </div>
+        <div class="col-xs-12 scatterplot"></div>
+        <div class="col-xs-12 histogram"></div>
     </div>
 </div> 
 
@@ -142,60 +150,71 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
   
   mvp_data = rows;
   
-  function remove_duplicates(c) {
-    mvp_data = rows;
+  function remove_duplicates(c, optArray) {
+    var mvp_data = rows;
+    if (optArray) {mvp_data = optArray}
     mvp_data_copy = [];
     var set = new Set();
     
     if (c=="College") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].College)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].College);
-              }
-            }        
+      for(var k = 0; k < mvp_data.length; k++){
+        if(set.has(mvp_data[k].College)){
+          continue;
+        }
+        else{
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].College);
+        }
+      }        
     }
     if (c=="Player") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].Player)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].Player);
-              }
-            }        
+      for(var k = 0; k < mvp_data.length; k++){
+        if(set.has(mvp_data[k].Player)){
+          continue;
+        }
+        else{
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].Player);
+        }
+      }        
     }
     if (c=="Team") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].Team)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].Team);
-              }
-            }        
+      for(var k = 0; k < mvp_data.length; k++){
+        if(set.has(mvp_data[k].Team)){
+          continue;
+        }
+        else{
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].Team);
+        }
+      }        
     }
     if (c=="Hometown") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].Hometown)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].Hometown);
-              }
-            }        
+      for(var k = 0; k < mvp_data.length; k++){
+        if(set.has(mvp_data[k].Hometown)){
+          continue;
+        }
+        else{
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].Hometown);
+        }
+      }        
     }
-
+    if (c=="League") {
+      for(var k = 0; k < mvp_data.length; k++){
+        if(set.has(mvp_data[k].League)){
+          continue;
+        }
+        else{
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].League);
+        }
+      }        
+    }
     return mvp_data_copy;
   }
 
-  var playerPointsNoDup = svg.selectAll(".playerPoints").data(remove_duplicates("Player"));
+  var playerPointsNoDup = svg.selectAll(".playerPoints").data(remove_duplicates("Player"), function(d) {return d.ID;});
   
   playerPointsNoDup
     .enter().append("image")
@@ -240,14 +259,14 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         var team = curr.attr("team");
         var college = curr.attr("college");
         var position = curr.attr("position");
-        svg.append("text")
-          .text(name + ' - ' + hometown)
-          .attr("x", width/2)
-          .attr("text-anchor", "middle")
-          .attr("y", height*.95)
-          .style("font-size", "20px")
-          .attr("stroke","black")
-          .attr("id","playerLabel");
+        //svg.append("text")
+        //  .text(name + ' - ' + hometown)
+        //  .attr("x", width/2)
+        //  .attr("text-anchor", "middle")
+        //  .attr("y", height*.95)
+        //  .style("font-size", "20px")
+        //  .attr("stroke","black")
+        //  .attr("id","playerLabel");
 
         name.split(' ').join('_')
         tip.transition()    
@@ -266,7 +285,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
                   "<strong><u>Salary:</u></strong>  $" + salary + "<br/>")
             .style("left", (d3.event.pageX) + "px")   
             .style("top", (d3.event.pageY - 28) + "px");  
-  })          
+  });
             
   playerPointsNoDup.on('mouseout',function(){
 				d3.select(this).style("opacity", "0.4");
@@ -274,7 +293,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         tip.transition()    
                 .duration(500)    
                 .style("opacity", 0); 
-	})
+	});
 
   playerPointsNoDup.on('click',function(){
         var curr = d3.select(this);
@@ -282,14 +301,14 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         rightWindow.select("#rightTitle")
                     .text(name);
 
-  })
+  });
   
   d3.select("#instructions-close").on("click", function() {
       d3.select("#instructions").remove();
   });
   
-  var margin = {top: 100, right: 100, bottom: 100, left: 100},
-  width = 600 - margin.left - margin.right,
+  var margin = {top: 20, right: 100, bottom: 100, left: 150},
+  width = 1260 - margin.left - margin.right,
   height = 500 - margin.top - margin.bottom;
 
   var x = d3.scale.linear()
@@ -346,27 +365,37 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
 
   format = d3.format("0,000");
 
-  var dots = scatterplot.selectAll(".dot")
-      .data(mvp_data)
-    .enter().append("circle")
+  var dots = scatterplot.selectAll(".dot").data(mvp_data, function(d) {return d.ID;});
+  dots.enter().append("circle")
       .attr("class", function(d) { return "dot " + d.Team + " " + d.College.split(' ').join('_')})
       .attr("r", 3.5)
       .attr("cx", function(d) { return x(Number(d.Age)); })
       .attr("cy", function(d) { return y(Number(d.Salary)); })
       .style("fill", function(d) { return color(d.League); })
       .on("mouseover", function(d) {		
-            div.transition()		
-                .duration(200)		
-                .style("opacity", .9);		
-            div.html("<strong>" + d.Player + "</strong>" + "<br/><br/>"  + "At " + d.Age + " years old " + "his salary was " + "$" + format(d.Salary))	
-                .style("left", (d3.event.pageX) + "px")		
-                .style("top", (d3.event.pageY - 28) + "px");	
-            })					
+            d.Player.split(' ').join('_')
+            tip.transition()    
+                    .duration(200)    
+                    .style("opacity", .9);    
+            tip.html("<img src='resources/images/player-photos/" + d.Player.toLowerCase().split(' ').join('_') + ".jpg'" +
+                      "style='float: left;',  height=160, width=130> <h4>"
+                      + d.Player + "</h4>" + "<br/>"  +
+                      "<strong><u>Hometown:</u></strong>  " + d.Hometown + "<br/>" + 
+                      "<strong><u>Team:</u></strong>  " + d.Team + "<br/>" + 
+                      "<strong><u>Position:</u></strong>  " + d.Position + "<br/>" + 
+                      "<strong><u>Age:</u></strong>  " + d.Age + "<br/>" + 
+                      "<strong><u>Height:</u></strong>  " + d.Height + "<br/>" + 
+                      "<strong><u>Weight:</u></strong>  " + d.Weight + " lbs<br/>" +
+                      "<strong><u>College:</u></strong>  " + d.College + "<br/>" + 
+                      "<strong><u>Salary:</u></strong>  $" + d.Salary + "<br/>")
+                .style("left", (d3.event.pageX) + "px")   
+                .style("top", (d3.event.pageY - 28) + "px");
+      })
         .on("mouseout", function(d) {		
-            div.transition()		
+            tip.transition()		
                 .duration(500)		
                 .style("opacity", 0);	
-        });
+      });
 
 
   var legend = scatterplot.selectAll(".legend")
@@ -387,7 +416,134 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
       .attr("dy", ".35em")
       .style("text-anchor", "end")
       .text(function(d) { return d; });
-      
+   
+  var collegeDropDown = d3.select(".college-dropdown").append("select")
+                    .attr("name", "college-list");
+  var teamDropDown = d3.select(".team-dropdown").append("select")
+                    .attr("name", "team-list");
+  var leagueDropDown = d3.select(".sport-dropdown").append("select")
+                    .attr("name", "sport-list"); 
+  
+
+
+  var colleges = remove_duplicates("College");
+  var teams = remove_duplicates("Team");
+  var leagues = remove_duplicates("League");
+  var allobject = {Age:"-- All --",
+    College:"-- All --",
+    Height:"-- All --",
+    Hometown:"-- All --",
+    Latitude:"-- All --",
+    League:"-- All --",
+    Longitude:"-- All --",
+    Player:"-- All --",
+    Position:"-- All --",
+    Salary:"-- All --",
+    Season:"-- All --",
+    Subleague:"-- All --",
+    Team:"-- All --",
+    Weight:"-- All --"
+  };
+  colleges.unshift(allobject);
+  teams.unshift(allobject);
+  leagues.unshift(allobject);
+  var collegeOptions = collegeDropDown.selectAll("option")
+           .data(colleges)
+         .enter()
+           .append("option");
+  var teamOptions = teamDropDown.selectAll("option")
+           .data(teams)
+         .enter()
+           .append("option");
+  var leagueOptions = leagueDropDown.selectAll("option")
+           .data(leagues)
+         .enter()
+           .append("option");
+           
+  collegeOptions.text(function (d) { return d.College; })
+      .attr("value", function (d) { return d.College; })
+      .attr("id", function (d) { return d.College.split(' ').join('_'); });
+  teamOptions.text(function (d) { return d.Team; })
+      .attr("value", function (d) { return d.Team; })
+      .attr("id", function (d) { return d.Team.split(' ').join('_'); });
+  leagueOptions.text(function (d) { return d.League; })
+      .attr("value", function (d) { return d.League; })
+      .attr("id", function (d) { return d.League.split(' ').join('_'); });
+
+  collegeDropDown.on("change", filterHandlerCollege);
+  teamDropDown.on("change", filterHandlerTeam);
+  leagueDropDown.on("change", filterHandlerLeague);
+
+  function filterHandlerCollege() {
+    filterDots("College");
+  }
+  function filterHandlerTeam() {
+    filterDots("Team");
+  }
+  function filterHandlerLeague() {
+    filterDots("League");
+  }
+
+  function filterDots(typeChanged) {
+    var college = collegeDropDown.node().value;
+    var team = teamDropDown.node().value;
+    var league = leagueDropDown.node().value;
+
+    var newData = mvp_data.filter( function(d) {
+      return (d.College == college || college == "-- All --") &&
+             (d.Team == team || team == "-- All --") &&
+             (d.League == league || league == "-- All --"); 
+    });
+    dots = scatterplot.selectAll(".dot").data(newData, function(d) {return d.ID;});
+    dots.enter();
+    dots.attr("display","inline");
+    dots.exit().attr("display","none");
+
+    var newColleges = remove_duplicates("College",newData);
+    var newTeams = remove_duplicates("Team",newData);
+    var newLeagues = remove_duplicates("League",newData);
+
+    newColleges.unshift(allobject);
+    newTeams.unshift(allobject);
+    newLeagues.unshift(allobject);
+
+    collegeOptions = collegeDropDown.selectAll("option").data(newColleges);
+    collegeOptions.enter().append("option");
+    teamOptions = teamDropDown.selectAll("option").data(newTeams);
+    teamOptions.enter().append("option");
+    leagueOptions = leagueDropDown.selectAll("option").data(newLeagues);
+    leagueOptions.enter().append("option");
+
+    collegeOptions.text(function (d) { return d.College; })
+        .attr("value", function (d) { return d.College; })
+        .attr("id", function (d) { return d.College.split(' ').join('_'); });
+    teamOptions.text(function (d) { return d.Team; })
+        .attr("value", function (d) { return d.Team; })
+        .attr("id", function (d) { return d.Team.split(' ').join('_'); });
+    leagueOptions.text(function (d) { return d.League; })
+        .attr("value", function (d) { return d.League; })
+        .attr("id", function (d) { return d.League.split(' ').join('_'); });
+
+    collegeOptions.exit().remove();
+    teamOptions.exit().remove();
+    leagueOptions.exit().remove();
+
+    switch (typeChanged) {
+      case "College":
+        d3.select('#'+college.split(' ').join('_')).property("selected", "selected");
+        break;
+      case "Team":
+        d3.select('#'+team.split(' ').join('_')).property("selected", "selected");
+        break;
+      case "League":
+        d3.select('#'+league.split(' ').join('_')).property("selected", "selected");
+        break;
+      default:
+        console.log(typeChanged);
+    }
+    
+
+  }
 });
 
 
