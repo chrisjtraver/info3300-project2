@@ -150,8 +150,9 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
   
   mvp_data = rows;
   
-  function remove_duplicates(c) {
-    mvp_data = rows;
+  function remove_duplicates(c, optArray) {
+    var mvp_data = rows;
+    if (optArray) {mvp_data = optArray}
     mvp_data_copy = [];
     var set = new Set();
     
@@ -213,7 +214,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
     return mvp_data_copy;
   }
 
-  var playerPointsNoDup = svg.selectAll(".playerPoints").data(remove_duplicates("Player"));
+  var playerPointsNoDup = svg.selectAll(".playerPoints").data(remove_duplicates("Player"), function(d) {return d.ID;});
   
   playerPointsNoDup
     .enter().append("image")
@@ -364,7 +365,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
 
   format = d3.format("0,000");
 
-  var dots = scatterplot.selectAll(".dot").data(mvp_data);
+  var dots = scatterplot.selectAll(".dot").data(mvp_data, function(d) {return d.ID;});
   dots.enter().append("circle")
       .attr("class", function(d) { return "dot " + d.Team + " " + d.College.split(' ').join('_')})
       .attr("r", 3.5)
@@ -460,17 +461,30 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
            .append("option");
            
   collegeOptions.text(function (d) { return d.College; })
-       .attr("value", function (d) { return d.College; });
+      .attr("value", function (d) { return d.College; })
+      .attr("id", function (d) { return d.College.split(' ').join('_'); });
   teamOptions.text(function (d) { return d.Team; })
-       .attr("value", function (d) { return d.Team; });
+      .attr("value", function (d) { return d.Team; })
+      .attr("id", function (d) { return d.Team.split(' ').join('_'); });
   leagueOptions.text(function (d) { return d.League; })
-       .attr("value", function (d) { return d.League; });
+      .attr("value", function (d) { return d.League; })
+      .attr("id", function (d) { return d.League.split(' ').join('_'); });
 
-  collegeDropDown.on("change", filterDots);
-  teamDropDown.on("change", filterDots);
-  leagueDropDown.on("change", filterDots);
+  collegeDropDown.on("change", filterHandlerCollege);
+  teamDropDown.on("change", filterHandlerTeam);
+  leagueDropDown.on("change", filterHandlerLeague);
 
-  function filterDots() {
+  function filterHandlerCollege() {
+    filterDots("College");
+  }
+  function filterHandlerTeam() {
+    filterDots("Team");
+  }
+  function filterHandlerLeague() {
+    filterDots("League");
+  }
+
+  function filterDots(typeChanged) {
     var college = collegeDropDown.node().value;
     var team = teamDropDown.node().value;
     var league = leagueDropDown.node().value;
@@ -480,11 +494,55 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
              (d.Team == team || team == "-- All --") &&
              (d.League == league || league == "-- All --"); 
     });
-    dots = scatterplot.selectAll(".dot").data(newData);
+    dots = scatterplot.selectAll(".dot").data(newData, function(d) {return d.ID;});
     dots.enter();
-    dots.transition().attr("display","inline");
+    dots.attr("display","inline");
     dots.exit().attr("display","none");
-    console.log(dots);
+
+    var newColleges = remove_duplicates("College",newData);
+    var newTeams = remove_duplicates("Team",newData);
+    var newLeagues = remove_duplicates("League",newData);
+
+    newColleges.unshift(allobject);
+    newTeams.unshift(allobject);
+    newLeagues.unshift(allobject);
+
+    collegeOptions = collegeDropDown.selectAll("option").data(newColleges);
+    collegeOptions.enter().append("option");
+    teamOptions = teamDropDown.selectAll("option").data(newTeams);
+    teamOptions.enter().append("option");
+    leagueOptions = leagueDropDown.selectAll("option").data(newLeagues);
+    leagueOptions.enter().append("option");
+
+    collegeOptions.text(function (d) { return d.College; })
+        .attr("value", function (d) { return d.College; })
+        .attr("id", function (d) { return d.College.split(' ').join('_'); });
+    teamOptions.text(function (d) { return d.Team; })
+        .attr("value", function (d) { return d.Team; })
+        .attr("id", function (d) { return d.Team.split(' ').join('_'); });
+    leagueOptions.text(function (d) { return d.League; })
+        .attr("value", function (d) { return d.League; })
+        .attr("id", function (d) { return d.League.split(' ').join('_'); });
+
+    collegeOptions.exit().remove();
+    teamOptions.exit().remove();
+    leagueOptions.exit().remove();
+
+    switch (typeChanged) {
+      case "College":
+        d3.select('#'+college.split(' ').join('_')).property("selected", "selected");
+        break;
+      case "Team":
+        d3.select('#'+team.split(' ').join('_')).property("selected", "selected");
+        break;
+      case "League":
+        d3.select('#'+league.split(' ').join('_')).property("selected", "selected");
+        break;
+      default:
+        console.log(typeChanged);
+    }
+    
+
   }
 });
 
