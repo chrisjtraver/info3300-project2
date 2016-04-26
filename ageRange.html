@@ -76,7 +76,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
     .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  var yScale, xScale, labelScale, rect, layer, yAxis, xAxis, layers, yGroupMax, yStackMax;
+  var yScale, xScale, labelScale, rect, layer, yAxis, xAxis, layers, yGroupMax, yStackMax, numBins;
 
   d3.selectAll("input").on("change", change);
 
@@ -99,8 +99,9 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
       .attr("transform", "translate(" + margin.left + ",0)")
       .call(yAxis);
 
-    console.log(rect);
-    rect.transition().duration(500)
+    rect = layer.selectAll("rect");
+    rect.transition()
+        .duration(500)
         .delay(function(d, i) { return i * 10; })
         .attr("x", function(d, i, j) { return xScale(d.x) + xScale.rangeBand() / 4 * j; })
         .attr("width", xScale.rangeBand() / 4)
@@ -117,6 +118,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
       .attr("transform", "translate(" + margin.left + ",0)")
       .call(yAxis);
 
+    rect = layer.selectAll("rect");
     rect.transition()
         .duration(500)
         .delay(function(d, i) { return i * 10; })
@@ -128,11 +130,9 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
   }
 
   function getData() {
-    // if (rect) {rect.remove();}
-
     var categoryToBins={Age: 10, Height: 10, Weight: 10, Salary: 10};
     var category = d3.select('input[name="category"]:checked').node().value;
-    var numBins = categoryToBins[category];
+    numBins = categoryToBins[category];
 
     var maxMin = d3.extent(mvp_data, function (row) {return Number(row[category]);}),
       range = maxMin[1]-maxMin[0];
@@ -147,10 +147,10 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         // label = String(begin) + "-" + String(end);
         label = Math.floor(end*10)/10;
       //Initialize all bins with this format
-      MLBBins[i]={x: end, label: label, y: 0};
-        NFLBins[i]={x: end, label: label, y: 0};
-        NBABins[i]={x: end, label: label, y: 0};
-        NHLBins[i]={x: end, label: label, y: 0};
+      MLBBins[i]={x: end, label: label, y: 0, id: i};
+        NFLBins[i]={x: end, label: label, y: 0, id: numBins + i};
+        NBABins[i]={x: end, label: label, y: 0, id: numBins*2 + i};
+        NHLBins[i]={x: end, label: label, y: 0, id: numBins*3 + i};
     }
 
     MLBRows.forEach(function (row) {
@@ -169,7 +169,9 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
     var allBins = [MLBBins, NFLBins, NBABins,NHLBins];
 
     //Adapted from mbostock, at http://bl.ocks.org/mbostock/3943967
-    layers = d3.layout.stack()(d3.range(4).map(function(d, i) { return allBins[i]; })),
+    var stack = d3.layout.stack();
+    layers = stack(d3.range(4).map(function(d, i) { return allBins[i]; })),
+    layers.forEach(function(layer,i) {})
     yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); }),
     yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
 
@@ -201,13 +203,13 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
     getData();
 
     layer = svg.selectAll(".layer")
-        .data(layers)
+        .data(layers, function (d) { return d[0].id/numBins;})
       .enter().append("g")
         .attr("class", "layer")
         .style("fill", function(d, i) { return color(i); });
 
     rect = layer.selectAll("rect")
-        .data(function(d) { return d; })
+        .data(function(d) { return d; }, function (d) { return d.id;})
       .enter().append("rect")
         .attr("x", function(d) { return xScale(d.x); })
         .attr("y", height)
@@ -239,11 +241,37 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         .transition().duration(500)
         .attr("x", function(d) { return xScale(d.x); })
         .attr("y", height-20)
-        .attr("width", xScale.rangeBand())
+        .attr("width", xScale.rangeBand()/4)
         .attr("height",20);
-    rect.transition()
+
+    var mode = d3.select('input[name="mode"]:checked').node().value;
+    if (mode==="grouped") {
+      yScale.domain([0, yGroupMax]);
+      d3.selectAll(".yAxis").remove();
+      svg.append("g")
+        .attr("class", "yAxis")
+        .attr("transform", "translate(" + margin.left + ",0)")
+        .call(yAxis);
+      rect.transition()
+        .duration(500)
+        .attr("x", function(d, i, j) { return xScale(d.x) + xScale.rangeBand() / 4 * j; })
+        .attr("width", xScale.rangeBand() / 4)
+        .attr("y", function(d) { return yScale(d.y); })
+        .attr("height", function(d) { return height - yScale(d.y); });
+    } else {
+      yScale.domain([0, yStackMax]);
+      d3.selectAll(".yAxis").remove();
+      svg.append("g")
+        .attr("class", "yAxis")
+        .attr("transform", "translate(" + margin.left + ",0)")
+        .call(yAxis);
+
+      rect.transition().duration(500)
+        .attr("x", function(d) { return xScale(d.x); })
+        .attr("width", xScale.rangeBand())
         .attr("y", function(d) { return yScale(d.y0 + d.y); })
         .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y); });
+    }
 
     //Reset Axes
     d3.selectAll(".xAxis").remove();
@@ -255,6 +283,8 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         .attr("transform", "translate(" + margin.left + ",0)")
         .call(yAxis);
         probe = layers;
+
+
   }
 });
 </script>
