@@ -29,15 +29,6 @@
             <h1 class="center">MVP Comparison Tool</h1>
         </div>
     </div>
-
-    <div class="row main-visualizations">
-        <div class="col-md-7" id="mvp-picker"></div>
-        <div class="col-md-5" id="mvp-stats"></div>
-    </div>
-    <div class="row mvp-comparison-tool">
-        <div class="col-md-6" id="compare-mvp1"></div>
-        <div class="col-md-6" id="compare-mvp2"></div>
-    </div>
     <div class="row overall-mvp-stats">
         <div class="col-xs-12" id="overall-stats">
           <form id="groupStackForm">
@@ -46,10 +37,10 @@
           </form>
           <br>
           <form id="categoryForm">
-            <label><input type="radio" name="mode" value="Height"> Height</label>
-            <label><input type="radio" name="mode" value="Weight"> Weight</label>
-            <label><input type="radio" name="mode" value="Age" checked> Age</label>
-            <label><input type="radio" name="mode" value="Salary"> Salary</label>
+            <label><input type="radio" name="category" value="Height"> Height</label>
+            <label><input type="radio" name="category" value="Weight"> Weight</label>
+            <label><input type="radio" name="category" value="Age" checked> Age</label>
+            <label><input type="radio" name="category" value="Salary"> Salary</label>
           </form>
         </div>
     </div>
@@ -67,7 +58,8 @@ var probe;
 d3.csv("data/mvp_list.csv", function (error, rows) {
   
   mvp_data = rows;
-  var numBins = 10;
+
+  var color = d3.scale.category10();
 
   var margin = {top: 40, right: 20, bottom: 50, left: 20},
       width = 960 - margin.left - margin.right,
@@ -84,24 +76,18 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
     .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
-
-
   var yScale, xScale, labelScale, rect, layer, yAxis, xAxis, layers, yGroupMax, yStackMax;
-  d3.selectAll("input").on("change", change);
-  initCategory("Age");
 
-  var timeout = setTimeout(function() {
-    d3.select("input[value=\"grouped\"]").property("checked", true).each(change);
-  }, 2000);
+  d3.selectAll("input").on("change", change);
+
+  initCategory();
 
   function change() {
-    clearTimeout(timeout);
     switch (this.value) {
       case "grouped": transitionGrouped(); break;
       case "stacked": transitionStacked(); break;
       default:
-        transitionCategory(this.value);
+        transitionCategory();
     }
   }
 
@@ -113,8 +99,8 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
       .attr("transform", "translate(" + margin.left + ",0)")
       .call(yAxis);
 
-    rect.transition()
-        .duration(500)
+    console.log(rect);
+    rect.transition().duration(500)
         .delay(function(d, i) { return i * 10; })
         .attr("x", function(d, i, j) { return xScale(d.x) + xScale.rangeBand() / 4 * j; })
         .attr("width", xScale.rangeBand() / 4)
@@ -141,11 +127,13 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         .attr("width", xScale.rangeBand());
   }
 
-  function initCategory(category) {
-    // var categoryToBins={Age: , Height: , Weight: , Salary: };
-    d3.selectAll(".xAxis").remove();
-    d3.selectAll(".yAxis").remove();
-    if (rect) {rect.remove();}
+  function getData() {
+    // if (rect) {rect.remove();}
+
+    var categoryToBins={Age: 10, Height: 10, Weight: 10, Salary: 10};
+    var category = d3.select('input[name="category"]:checked').node().value;
+    var numBins = categoryToBins[category];
+
     var maxMin = d3.extent(mvp_data, function (row) {return Number(row[category]);}),
       range = maxMin[1]-maxMin[0];
 
@@ -158,10 +146,11 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         end = (i+1)*(range/numBins)+maxMin[0]-1,
         // label = String(begin) + "-" + String(end);
         label = Math.floor(end*10)/10;
-      MLBBins[i]={x: end, label: label, y: 0} ;
-      NFLBins[i]={x: end, label: label, y: 0};
-      NBABins[i]={x: end, label: label, y: 0};
-      NHLBins[i]={x: end, label: label, y: 0};
+      //Initialize all bins with this format
+      MLBBins[i]={x: end, label: label, y: 0};
+        NFLBins[i]={x: end, label: label, y: 0};
+        NBABins[i]={x: end, label: label, y: 0};
+        NHLBins[i]={x: end, label: label, y: 0};
     }
 
     MLBRows.forEach(function (row) {
@@ -180,9 +169,9 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
     var allBins = [MLBBins, NFLBins, NBABins,NHLBins];
 
     //Adapted from mbostock, at http://bl.ocks.org/mbostock/3943967
-     layers = d3.layout.stack()(d3.range(4).map(function(d, i) { return allBins[i]; })),
-     yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); }),
-     yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
+    layers = d3.layout.stack()(d3.range(4).map(function(d, i) { return allBins[i]; })),
+    yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); }),
+    yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
 
     xScale = d3.scale.ordinal()
         .domain(MLBBins.map(function(d){return d.x;}))
@@ -191,8 +180,6 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
     yScale = d3.scale.linear()
         .domain([0, yStackMax])
         .range([height, 0]);
-
-    var color = d3.scale.category10();
 
     labelScale = d3.scale.ordinal()
         .domain(MLBBins.map(function(d){return d.label;}))
@@ -208,6 +195,10 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
       .tickSize(1)
       .tickPadding(6)
       .orient("left");
+  }
+
+  function initCategory() {
+    getData();
 
     layer = svg.selectAll(".layer")
         .data(layers)
@@ -223,127 +214,47 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         .attr("width", xScale.rangeBand())
         .attr("height", 0);
 
-    rect.transition()
-        .delay(function(d, i) { return i * 10; })
+    rect.transition().duration(1500)
         .attr("y", function(d) { return yScale(d.y0 + d.y); })
         .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y); });
 
-    svg.append("g")
-        .attr("class", "xAxis")
+    svg.append("g").attr("class", "xAxis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
-    svg.append("g")
-        .attr("class", "yAxis")
+    svg.append("g").attr("class", "yAxis")
         .attr("transform", "translate(" + margin.left + ",0)")
         .call(yAxis);
   }
-  function transitionCategory(category) {
-    // var categoryToBins={Age: , Height: , Weight: , Salary: };
-    d3.selectAll(".xAxis").remove();
-    d3.selectAll(".yAxis").remove();
-    if (rect) {probe = rect; rect.remove()};
-    if (layer) {layer.remove()};
-    var maxMin = d3.extent(mvp_data, function (row) {return Number(row[category]);}),
-      range = maxMin[1]-maxMin[0];
 
-    var MLBBins=[],
-      NFLBins=[],
-      NBABins=[],
-      NHLBins=[];
-    for (var i = numBins; i >= 0; i--) {
-      var begin = i*(range/numBins)+maxMin[0],
-        end = (i+1)*(range/numBins)+maxMin[0]-1,
-        // label = String(begin) + "-" + String(end);
-        label = Math.floor(end*10)/10;
-      MLBBins[i]={x: end, label: label, y: 0} ;
-      NFLBins[i]={x: end, label: label, y: 0};
-      NBABins[i]={x: end, label: label, y: 0};
-      NHLBins[i]={x: end, label: label, y: 0};
-    }
-
-    MLBRows.forEach(function (row) {
-      var ind = Math.floor((row[category]-maxMin[0])/(range/numBins));
-      MLBBins[ind].y++;});
-    NFLRows.forEach(function (row) {
-      var ind = Math.floor((row[category]-maxMin[0])/(range/numBins));
-      NFLBins[ind].y++;});
-    NBARows.forEach(function (row) {
-      var ind = Math.floor((row[category]-maxMin[0])/(range/numBins));
-      NBABins[ind].y++;});
-    NHLRows.forEach(function (row) {
-      var ind = Math.floor((row[category]-maxMin[0])/(range/numBins));
-      NHLBins[ind].y++;});
-
-    var allBins = [MLBBins, NFLBins, NBABins,NHLBins];
-
-    //Adapted from mbostock, at http://bl.ocks.org/mbostock/3943967
-     layers = d3.layout.stack()(d3.range(4).map(function(d, i) { return allBins[i]; })),
-     yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); }),
-     yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
-
-    xScale = d3.scale.ordinal()
-        .domain(MLBBins.map(function(d){return d.x;}))
-        .rangeRoundBands([margin.left, width], .2);
-
-    yScale = d3.scale.linear()
-        .domain([0, yStackMax])
-        .range([height, 0]);
-
-    var color = d3.scale.category10();
-
-    labelScale = d3.scale.ordinal()
-        .domain(MLBBins.map(function(d){return d.label;}))
-        .rangeRoundBands([margin.left, width], .2);
-
-    xAxis = d3.svg.axis()
-        .scale(labelScale)
-        .tickSize(0)
-        .tickPadding(6)
-        .orient("bottom");
-    yAxis = d3.svg.axis()
-      .scale(yScale)
-      .tickSize(1)
-      .tickPadding(6)
-      .orient("left");
+  function transitionCategory() {
+    getData();
 
     layer = svg.selectAll(".layer")
         .data(layers)
-      .enter().append("g")
-        .attr("class", "layer")
         .style("fill", function(d, i) { return color(i); });
+    layer.exit().remove();
 
-    rect = rect.transition()
+    rect = layer.selectAll("rect")
+        .data(function(d) { return d; })
+        .transition().duration(500)
         .attr("x", function(d) { return xScale(d.x); })
-        .attr("y", height)
+        .attr("y", height-20)
         .attr("width", xScale.rangeBand())
-        .attr("height", 0);
+        .attr("height",20);
+    rect.transition()
+        .attr("y", function(d) { return yScale(d.y0 + d.y); })
+        .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y); });
 
-
-    // rect.data(layers).transition()
-    //     .delay(function(d, i) { return i * 10; })
-    //     .attr("y", function(d) { return yScale(d.y0 + d.y); })
-    //     .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y); })
-    //     .transition()
-    //     .attr("x", function(d) { return xScale(d.x); })
-    //     .attr("width", xScale.rangeBand());
-
-    // rect.transition()
-    //     .duration(500)
-    //     .delay(function(d, i) { return i * 10; })
-    //     .attr("y", function(d) { return yScale(d.y0 + d.y); })
-    //     .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y); })
-    //   .transition()
-    //     .attr("x", function(d) { return xScale(d.x); })
-    //     .attr("width", xScale.rangeBand());
-
-    svg.append("g")
-        .attr("class", "xAxis")
+    //Reset Axes
+    d3.selectAll(".xAxis").remove();
+    d3.selectAll(".yAxis").remove();
+    svg.append("g").attr("class", "xAxis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
-    svg.append("g")
-        .attr("class", "yAxis")
+    svg.append("g").attr("class", "yAxis")
         .attr("transform", "translate(" + margin.left + ",0)")
         .call(yAxis);
+        probe = layers;
   }
 });
 </script>
