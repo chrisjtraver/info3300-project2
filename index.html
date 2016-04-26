@@ -156,59 +156,59 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
     var set = new Set();
     
     if (c=="College") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].College)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].College);
-              }
-            }        
+      for(var k = 0; k < mvp_data.length; k++){
+        if(set.has(mvp_data[k].College)){
+          continue;
+        }
+        else{
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].College);
+        }
+      }        
     }
     if (c=="Player") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].Player)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].Player);
-              }
-            }        
+      for(var k = 0; k < mvp_data.length; k++){
+        if(set.has(mvp_data[k].Player)){
+          continue;
+        }
+        else{
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].Player);
+        }
+      }        
     }
     if (c=="Team") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].Team)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].Team);
-              }
-            }        
+      for(var k = 0; k < mvp_data.length; k++){
+        if(set.has(mvp_data[k].Team)){
+          continue;
+        }
+        else{
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].Team);
+        }
+      }        
     }
     if (c=="Hometown") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].Hometown)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].Hometown);
-              }
-            }        
+      for(var k = 0; k < mvp_data.length; k++){
+        if(set.has(mvp_data[k].Hometown)){
+          continue;
+        }
+        else{
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].Hometown);
+        }
+      }        
     }
     if (c=="League") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].League)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].League);
-              }
-            }        
+      for(var k = 0; k < mvp_data.length; k++){
+        if(set.has(mvp_data[k].League)){
+          continue;
+        }
+        else{
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].League);
+        }
+      }        
     }
     return mvp_data_copy;
   }
@@ -284,7 +284,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
                   "<strong><u>Salary:</u></strong>  $" + salary + "<br/>")
             .style("left", (d3.event.pageX) + "px")   
             .style("top", (d3.event.pageY - 28) + "px");  
-  })          
+  });
             
   playerPointsNoDup.on('mouseout',function(){
 				d3.select(this).style("opacity", "0.4");
@@ -292,7 +292,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         tip.transition()    
                 .duration(500)    
                 .style("opacity", 0); 
-	})
+	});
 
   playerPointsNoDup.on('click',function(){
         var curr = d3.select(this);
@@ -300,7 +300,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         rightWindow.select("#rightTitle")
                     .text(name);
 
-  })
+  });
   
   d3.select("#instructions-close").on("click", function() {
       d3.select("#instructions").remove();
