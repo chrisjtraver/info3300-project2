@@ -364,9 +364,8 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
 
   format = d3.format("0,000");
 
-  var dots = scatterplot.selectAll(".dot")
-      .data(mvp_data)
-    .enter().append("circle")
+  var dots = scatterplot.selectAll(".dot").data(mvp_data);
+  dots.enter().append("circle")
       .attr("class", function(d) { return "dot " + d.Team + " " + d.College.split(' ').join('_')})
       .attr("r", 3.5)
       .attr("cx", function(d) { return x(Number(d.Age)); })
@@ -417,37 +416,76 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
       .style("text-anchor", "end")
       .text(function(d) { return d; });
    
-  var collegedropDown = d3.select(".college-dropdown").append("select")
+  var collegeDropDown = d3.select(".college-dropdown").append("select")
                     .attr("name", "college-list");
-  var teamdropDown = d3.select(".team-dropdown").append("select")
+  var teamDropDown = d3.select(".team-dropdown").append("select")
                     .attr("name", "team-list");
-  var sportdropDown = d3.select(".sport-dropdown").append("select")
+  var leagueDropDown = d3.select(".sport-dropdown").append("select")
                     .attr("name", "sport-list"); 
   
-  var collegeoptions = collegedropDown.selectAll("option")
-           .data(remove_duplicates("College"))
+
+
+  var colleges = remove_duplicates("College");
+  var teams = remove_duplicates("Team");
+  var leagues = remove_duplicates("League");
+  var allobject = {Age:"-- All --",
+    College:"-- All --",
+    Height:"-- All --",
+    Hometown:"-- All --",
+    Latitude:"-- All --",
+    League:"-- All --",
+    Longitude:"-- All --",
+    Player:"-- All --",
+    Position:"-- All --",
+    Salary:"-- All --",
+    Season:"-- All --",
+    Subleague:"-- All --",
+    Team:"-- All --",
+    Weight:"-- All --"
+  };
+  colleges.unshift(allobject);
+  teams.unshift(allobject);
+  leagues.unshift(allobject);
+  var collegeOptions = collegeDropDown.selectAll("option")
+           .data(colleges)
          .enter()
            .append("option");
-  var teamoptions = teamdropDown.selectAll("option")
-           .data(remove_duplicates("Team"))
+  var teamOptions = teamDropDown.selectAll("option")
+           .data(teams)
          .enter()
            .append("option");
-  var sportoptions = sportdropDown.selectAll("option")
-           .data(remove_duplicates("League"))
+  var leagueOptions = leagueDropDown.selectAll("option")
+           .data(leagues)
          .enter()
            .append("option");
            
-  collegeoptions.text(function (d) { return d.College; })
-       .attr("value", function (d) { return d.College.split(' ').join('_'); });
-  teamoptions.text(function (d) { return d.Team; })
+  collegeOptions.text(function (d) { return d.College; })
+       .attr("value", function (d) { return d.College; });
+  teamOptions.text(function (d) { return d.Team; })
        .attr("value", function (d) { return d.Team; });
-  sportoptions.text(function (d) { return d.League; })
+  leagueOptions.text(function (d) { return d.League; })
        .attr("value", function (d) { return d.League; });
-       
-       
-  //var newData = mvp_data.filter( function(d) { return d.College == "Davidson College"; } );
-  //dots.data(newData);
-  //dots.exit().remove();   
+
+  collegeDropDown.on("change", filterDots);
+  teamDropDown.on("change", filterDots);
+  leagueDropDown.on("change", filterDots);
+
+  function filterDots() {
+    var college = collegeDropDown.node().value;
+    var team = teamDropDown.node().value;
+    var league = leagueDropDown.node().value;
+
+    var newData = mvp_data.filter( function(d) {
+      return (d.College == college || college == "-- All --") &&
+             (d.Team == team || team == "-- All --") &&
+             (d.League == league || league == "-- All --"); 
+    });
+    dots = scatterplot.selectAll(".dot").data(newData);
+    dots.enter();
+    dots.transition().attr("display","inline");
+    dots.exit().attr("display","none");
+    console.log(dots);
+  }
 });
 
 
