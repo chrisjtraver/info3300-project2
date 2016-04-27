@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script> <!--D3 Library Import-->
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"> </script> <!--JQuery Library Import-->
+  <link rel="stylesheet" type="text/css" href="style.css"> <!--External CSS Import-->
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,500,100' rel='stylesheet' type='text/css'> <!-- Import Roboto Font -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous"> <!-- Import Bootstrap -->
+  <script src="http://d3js.org/topojson.v1.min.js"></script> <!-- Import map JSON -->
+</head>
+
+<body>
+<div class="container">
+    <div class="row title-row">
+        <div class="col-xs-12" id="title">
+            <h1 class="center">Master of MVPs</h1>
+            <h6 class="center">By Chris Traver, Rohit Biswas & Chris Vrabel</h6>
+            <p class="center">A data visualization of NBA, NHL, MLB, and NBA most valuable players (MVPs) between 2000-2015.</p>
+        </div>
+    </div>
+    <div class="row interactive-map">
+        <div class="col-xs-12" id="mvp-picker"></div>
+        <div id="instructions">
+          <h3>Instructions</h3>
+          <p>Begin by selecting a point on the map below.  Different sports are represented by different icons, and the locations
+          of each icon represent the hometown of that MVP.</p>
+          <p>You can zoom and pan using your mouse and the scroll wheel.  You can also hover over a data point
+          to view bio information about that MVP.</p>
+          <p>Next, click on an icon to load it into the detailed visualization below the map.</p>
+          <button id="instructions-close">Lets go!</button>
+        </div>
+    </div>
+    <div class="row player-visualizations">
+        <div class="col-xs-12" id="mvp-stats"></div>
+    </div>
+    <div class="row player-visualizations2">
+        <div class="col-xs-12" id="mvp-graphs"></div>
+        <div class="col-xs-12" id="mvp-by-season"></div>
+    </div>
+    <div class="row overall-stats-title">
+        <div class="col-xs-12" >
+                <h2 class="center">Overall Statistics</h2>
+                <p class="center">There are many surprising commonalities between NHL, NBA, MLB, and NFL most valuable players.  Here
+                is a breakdown of some interesting trends.</p>
+        </div>
+    </div>
+    <div class="row overall-stats">
+        <div class="col-md-6 scatterplot"></div>
+        <div class="col-md-6" id="histogram"></div>
+    </div>
+</div> 
+
+</body>
+
+<script>
+
+var width = 1600,
+    height = 500,
+    scale0 = (width - 1) / 2 / Math.PI;
+
+var projection = d3.geo.mercator();
+
+var zoom = d3.behavior.zoom()
+    .translate([width / 2, height / 2])
+    .scale(scale0)
+    .scaleExtent([scale0,   18 * scale0])
+    .on("zoom", zoomed);
+
+var path = d3.geo.path()
+    .projection(projection);
+
+var svg = d3.select("#mvp-picker").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .attr("class", "map")
+  .append("g");
+
+var g = svg.append("g");
+
+var tip = d3.select(".interactive-map").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+    
+svg.append("rect")
+    .attr("class", "overlay")
+    .attr("width", width)
+    .attr("height", height);
+
+svg
+    .call(zoom)
+    .call(zoom.event);
+
+d3.json("resources/world-110m.json", function(error, world) {
+  if (error) throw error;
+
+  g.append("path")
+      .datum({type: "Sphere"})
+      .attr("class", "sphere")
+      .attr("d", path);
+
+  g.append("path")
+      .datum(topojson.merge(world, world.objects.countries.geometries))
+      .attr("class", "land")
+      .attr("d", path);
+
+  g.append("path")
+      .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
+      .attr("class", "boundary")
+      .attr("d", path);
+
+});
+
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+mvpWindowWidth = window.innerWidth;
+mvpWindowHeight = 100;
+var mvpWindow = d3.select("#mvp-stats").append("svg")
+      .attr("width", mvpWindowWidth + margin.left + margin.right)
+      .attr("height", mvpWindowHeight + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+mvpWindow.append("text")
+            .text("")
+            .attr("x", mvpWindowWidth/2)
+            .attr("text-anchor", "middle")
+            .attr("y", mvpWindowHeight*.2)
+            .attr("font-size", "40px")
+            .attr("id", "mvpWindowTitle");
+
+mvpWindow.append("text")
+            .text("")
+            .attr("x", mvpWindowWidth/2)
+            .attr("text-anchor", "middle")
+            .attr("y", mvpWindowHeight*.4)
+            .attr("font-size", "20px")
+            .attr("id", "seasonMVP");
+
+var mvpGraphWindow = d3.select("#mvp-graphs").append("svg")
+      .attr("width", window.innerWidth/2 + margin.left + margin.right)
+      .attr("height", 500 + margin.top*2 + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var mvpSeasons = d3.select("#mvp-by-season").append("svg")
+      .attr("width", window.innerWidth/2 + margin.left + margin.right)
+      .attr("height", 500 + margin.top*2 + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+mvpSeasons.append("text")
+          .text("How they did each season")
+          .attr("x", window.innerWidth/2)
+          .attr("text-anchor", "middle")
+          .attr("y", 20)
+          .attr("font-size", "40px")
+          .attr("id", "rightMVPWindowTitle");
+
+function zoomed() {
+  projection
+      .translate(zoom.translate())
+      .scale(zoom.scale());
+
+  g.selectAll("path")
+      .attr("d", path);
+
+  svg.selectAll("image").attr("x", function(d) {return projection([d.Longitude, d.Latitude])[0]})
+  .attr("y", function(d) {return projection([d.Longitude, d.Latitude])[1]})
+}
+
+d3.select(self.frameElement).style("height", height + "px");
+
+var mvp_data;
+
+d3.csv("data/mvp_list.csv", function (error, rows) {
+  
+  mvp_data = rows;
+  
+  function remove_duplicates(c) {
+    mvp_data = rows;
+    mvp_data_copy = [];
+    var set = new Set();
+    
+    if (c=="College") {
+            for(var k = 0; k < mvp_data.length; k++){
+              if(set.has(mvp_data[k].College)){
+                continue;
+              }
+              else{
+                mvp_data_copy.push(mvp_data[k]);
+                set.add(mvp_data[k].College);
+              }
+            }        
+    }
+    if (c=="Player") {
+            for(var k = 0; k < mvp_data.length; k++){
+              if(set.has(mvp_data[k].Player)){
+                continue;
+              }
+              else{
+                mvp_data_copy.push(mvp_data[k]);
+                set.add(mvp_data[k].Player);
+              }
+            }        
+    }
+    if (c=="Team") {
+            for(var k = 0; k < mvp_data.length; k++){
+              if(set.has(mvp_data[k].Team)){
+                continue;
+              }
+              else{
+                mvp_data_copy.push(mvp_data[k]);
+                set.add(mvp_data[k].Team);
+              }
+            }        
+    }
+    if (c=="Hometown") {
+            for(var k = 0; k < mvp_data.length; k++){
+              if(set.has(mvp_data[k].Hometown)){
+                continue;
+              }
+              else{
+                mvp_data_copy.push(mvp_data[k]);
+                set.add(mvp_data[k].Hometown);
+              }
+            }        
+    }
+
+    return mvp_data_copy;
+  }
+
+  var playerPointsNoDup = svg.selectAll(".playerPoints").data(remove_duplicates("Player"));
+  
+  playerPointsNoDup
+    .enter().append("image")
+    .attr("x", function(d) {return projection([d.Longitude, d.Latitude])[0];})
+    .attr("y", function(d) {return projection([d.Longitude, d.Latitude])[1];})
+    .attr("name", function(d) {return d.Player;})
+    .attr("hometown", function(d) {return d.Hometown;})
+    .attr("age", function(d) {return d.Age;})
+    .attr("pheight", function(d) {return d.Height;})
+    .attr("weight", function(d) {return d.Weight;})
+    .attr("team", function(d) {return d.Team;})
+    .attr("college", function(d) {return d.College;})
+    .attr("salary", function(d) {return d.Salary;})
+    .attr("position", function(d) {return d.Position;})
+    .attr("league", function(d) {return d.League;})
+    .attr("season", function(d) {return d.Season;})
+    .attr("width", 20)
+    .attr("height", 20)
+    .style("opacity", "0.4")
+    .attr("xlink:href", function (d) {
+          if (d.League == "MLB") {
+              return "resources/images/mlb.png";
+          }                  
+          if (d.League == "NHL") {
+              return "resources/images/nhl.png";
+          }
+          if (d.League == "NBA") {
+              return "resources/images/nba.png";
+          }
+          if (d.League == "NFL") {
+              return "resources/images/nfl.png";
+          }
+    });
+
+  playerPointsNoDup.on('mouseover',function(){
+        var curr = d3.select(this);
+        curr.style("opacity", "0.7");
+        var name = curr.attr("name");
+        var age = curr.attr("age");
+        var hometown = curr.attr("hometown");
+        var salary = curr.attr("salary");
+        var weight = curr.attr("weight");
+        var playerHeight = curr.attr("pheight");
+        var team = curr.attr("team");
+        var college = curr.attr("college");
+        var position = curr.attr("position");
+        svg.append("text")
+          .text(name + ' - ' + hometown)
+          .attr("x", width/2)
+          .attr("text-anchor", "middle")
+          .attr("y", height*.95)
+          .style("font-size", "20px")
+          .attr("stroke","black")
+          .attr("id","playerLabel");
+
+        name.split(' ').join('_')
+        tip.transition()    
+                .duration(200)    
+                .style("opacity", .9);    
+        tip.html("<img src='resources/images/player-photos/" + name.toLowerCase().split(' ').join('_') + ".jpg'" +
+                  "style='float: left;',  height=160, width=130> <h4>"
+                  + name + "</h4>" + "<br/>"  +
+                  "<strong><u>Hometown:</u></strong>  " + hometown + "<br/>" + 
+                  "<strong><u>Team:</u></strong>  " + team + "<br/>" + 
+                  "<strong><u>Position:</u></strong>  " + position + "<br/>" + 
+                  "<strong><u>Age:</u></strong>  " + age + "<br/>" + 
+                  "<strong><u>Height:</u></strong>  " + playerHeight + "<br/>" + 
+                  "<strong><u>Weight:</u></strong>  " + weight + " lbs<br/>" +
+                  "<strong><u>College:</u></strong>  " + college + "<br/>" + 
+                  "<strong><u>Salary:</u></strong>  $" + salary + "<br/>")
+            .style("left", (d3.event.pageX) + "px")   
+            .style("top", (d3.event.pageY - 28) + "px");  
+  })          
+            
+  playerPointsNoDup.on('mouseout',function(){
+        d3.select(this).style("opacity", "0.4");
+        svg.select("#playerLabel").remove();
+        tip.transition()    
+                .duration(500)    
+                .style("opacity", 0); 
+  })
+
+  playerPointsNoDup.on('click',function(){
+        mvpWindow.selectAll("*").remove();
+        mvpGraphWindow.selectAll("*").remove();
+        var curr = d3.select(this);
+        var name = curr.attr("name");
+        var league = curr.attr("league");
+        var position = curr.attr("position");
+        var season = curr.attr("season");
+        
+        var spaceIndex = name.indexOf(' ');
+        var firstName = name.substring(0, spaceIndex);
+        var lastName = name.substring(spaceIndex+1, name.length);
+        var filename;
+
+        if(league == "NFL"){
+          filename = firstName + "_";
+        }
+        else{
+          filename = firstName.toLowerCase() + "_" + lastName.toLowerCase() + ".csv";
+        }
+
+        d3.csv("data/player_stats/" + league.toLowerCase() + "/" + filename, function (error2, rows2) {
+          var playerData = rows2;
+          var wantedStats = [];
+          var actualSeason = parseInt(season);
+          if(league == "NBA" || league == "NHL")
+            actualSeason -= 1
+          //Get Stats from the Player's MVP Season
+          for(var k = 0; k < playerData.length; k++){
+            var season_Year = "";
+            if(league == "NHL" || league == "NBA")
+              season_year = playerData[k].Season.substring(0,4)
+            else
+              season_year = playerData[k].Year.substring(0,4)
+
+            if(season_year == actualSeason.toString()){
+              var temp = [];
+              if(league == "NBA"){
+
+                wantedStats = [
+                              {Category: "Points", Player: playerData[k].PTS, League: 0, stats: temp},
+                              {Category: "Threes", Player: playerData[k].Threes, League: 0, stats: temp},
+                              {Category: "Rebounds", Player: playerData[k].TRB, League: 0, stats: temp},
+                              {Category: "Assists", Player: playerData[k].AST, League: 0, stats: temp},
+                              {Category: "Steals", Player: playerData[k].STL, League: 0, stats: temp},
+                              {Category: "Blocks", Player: playerData[k].BLK, League: 0, stats: temp},
+                              {Category: "eFG", Player: playerData[k].eFG_Percentage, League: 0, stats: temp}
+                              ];
+              }
+              else if(league == "MLB"){
+                if(position == "P"){
+                  wantedStats = [
+                                {Category: "Wins", Player: playerData[k].W, League: 0, stats: temp},
+                                {Category: "ERA", Player: playerData[k].ERA, League: 0, stats: temp},
+                                {Category: "Innings", Player: playerData[k].IP, League: 0, stats: temp},
+                                {Category: "Complete Game", Player: playerData[k].CG, League: 0, stats: temp},
+                                {Category: "Shutouts", Player: playerData[k].SHO, League: 0, stats: temp},
+                                {Category: "Strikeouts", Player: playerData[k].SO, League: 0, stats: temp},
+                                {Category: "WHIP", Player: playerData[k].WHIP, League: 0, stats: temp}
+                                ];
+                }
+                else{
+                  wantedStats = [
+                                {Category: "Hits", Player: playerData[k].H, League: 0, stats: temp},
+                                {Category: "Runs", Player: playerData[k].R, League: 0, stats: temp},
+                                {Category: "HR", Player: playerData[k].HR, League: 0, stats: temp},
+                                {Category: "SB", Player: playerData[k].SB, League: 0, stats: temp},
+                                {Category: "RBI", Player: playerData[k].RBI, League: 0, stats: temp},
+                                {Category: "BA", Player: playerData[k].BA, League: 0, stats: temp},
+                                {Category: "Slugging", Player: playerData[k].SLG, League: 0, stats: temp}
+                                ];
+                }
+              }
+              break;
+            }
+          }
+
+          //Get league average Stats
+          d3.csv("data/" + league.toLowerCase() + "_league_averages.csv", function (error3, rows3) {
+            var averageData = rows3;
+
+            for(var k = 0; k < averageData.length; k++){
+              var season_year = "";
+              if(league == "NHL" || league == "NBA")
+                season_year = averageData[k].Season.substring(0,4)
+              else
+                season_year = averageData[k].Year.substring(0,4)
+
+              if(season_year == actualSeason.toString()){
+                if(league == "NBA"){
+                  wantedStats[0].League = averageData[k].PTS;
+                  wantedStats[1].League = averageData[k].Threes;
+                  wantedStats[2].League = averageData[k].TRB;
+                  wantedStats[3].League = averageData[k].AST;
+                  wantedStats[4].League = averageData[k].STL;
+                  wantedStats[5].League = averageData[k].BLK;
+                  wantedStats[6].League = averageData[k].eFG_Percentage;
+                }
+                else if(league == "MLB"){
+                  if(position == "P"){
+                    wantedStats[0].League = averageData[k].W;
+                    wantedStats[1].League = averageData[k].ERA;
+                    wantedStats[2].League = averageData[k].IP;
+                    wantedStats[3].League = averageData[k].CG;
+                    wantedStats[4].League = averageData[k].SHO;
+                    wantedStats[5].League = averageData[k].SO;
+                    wantedStats[6].League = averageData[k].WHIP;
+                  }
+                  else{
+                    wantedStats[0].League = averageData[k].H;
+                    wantedStats[1].League = averageData[k].R;
+                    wantedStats[2].League = averageData[k].HR;
+                    wantedStats[3].League = averageData[k].SB;
+                    wantedStats[4].League = averageData[k].RBI;
+                    wantedStats[5].League = averageData[k].BA;
+                    wantedStats[6].League = averageData[k].SLG;
+                  }
+                }
+              }
+            }
+            mvp_avg_graph(mvpGraphWindow, firstName + " " + lastName, wantedStats);
+          });
+          //END get league average stats
+
+          /*******************************************************
+          NOW GRAPH THE STATS
+
+          IN loop to get playersMVPStat.  Create new object or array
+          that holds their values from every season to create the line 
+          charts.
+
+          Need Shaqs stats.
+
+          Repeat all this for the other sports.
+          *******************************************************/
+          
+          
+
+
+
+        });
+        mvpWindow.append("text")
+            .text("")
+            .attr("x", mvpWindowWidth/2)
+            .attr("text-anchor", "middle")
+            .attr("y", mvpWindowHeight*.2)
+            .attr("font-size", "40px")
+            .attr("id", "mvpWindowTitle");
+
+        mvpWindow.append("text")
+            .text("")
+            .attr("x", mvpWindowWidth/2)
+            .attr("text-anchor", "middle")
+            .attr("y", mvpWindowHeight*.45)
+            .attr("font-size", "20px")
+            .attr("id", "seasonMVP");
+
+        mvpWindow.select("#mvpWindowTitle")
+                    .text(name);
+        mvpWindow.select("#seasonMVP")
+                    .text(season + " " + league + " MVP");
+
+  })
+  
+  d3.select("#instructions-close").on("click", function() {
+      d3.select("#instructions").remove();
+  });
+  
+  var margin = {top: 100, right: 100, bottom: 100, left: 100},
+  width = 600 - margin.left - margin.right,
+  height = 500 - margin.top - margin.bottom;
+
+  var x = d3.scale.linear()
+    .range([0, width]);
+
+  var y = d3.scale.linear()
+    .range([height, 0]);
+
+  var color = d3.scale.category10();
+
+  var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+  var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+  var scatterplot = d3.select(".scatterplot").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // Define the div for the tooltip
+  var div = d3.select(".scatterplot").append("div") 
+    .attr("class", "scatterplot-tooltip")       
+    .style("opacity", 0);
+    
+  x.domain(d3.extent(rows, function(d) { return Number(d.Age); })).nice();
+  y.domain(d3.extent(rows, function(d) { return Number(d.Salary); })).nice();
+
+  scatterplot.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("x", width)
+      .attr("y", -6)
+      .style("text-anchor", "end")
+      .text("Age (yrs)");
+
+  scatterplot.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Salary ($)")
+
+  format = d3.format("0,000");
+
+  var dots = scatterplot.selectAll(".dot")
+      .data(mvp_data)
+    .enter().append("circle")
+      .attr("class", function(d) { return "dot " + d.Team + " " + d.College.split(' ').join('_')})
+      .attr("r", 3.5)
+      .attr("cx", function(d) { return x(Number(d.Age)); })
+      .attr("cy", function(d) { return y(Number(d.Salary)); })
+      .style("fill", function(d) { return color(d.League); })
+      .on("mouseover", function(d) {    
+            div.transition()    
+                .duration(200)    
+                .style("opacity", .9);    
+            div.html("<strong>" + d.Player + "</strong>" + "<br/><br/>"  + "At " + d.Age + " years old " + "his salary was " + "$" + format(d.Salary))  
+                .style("left", (d3.event.pageX) + "px")   
+                .style("top", (d3.event.pageY - 28) + "px");  
+            })          
+        .on("mouseout", function(d) {   
+            div.transition()    
+                .duration(500)    
+                .style("opacity", 0); 
+        });
+
+
+  var legend = scatterplot.selectAll(".legend")
+      .data(color.domain())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend.append("rect")
+      .attr("x", width - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+
+  legend.append("text")
+      .attr("x", width - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+      
+});
+
+function mvp_avg_graph(svg, name, data){
+  var margin = {top: 40, right: 20, bottom: 30, left: 40},
+    width = window.innerWidth/2 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+  var x0 = d3.scale.ordinal()
+      .rangeRoundBands([0, width], .1);
+
+  var x1 = d3.scale.ordinal();
+
+  var y = d3.scale.linear()
+      .range([height, 0]);
+
+  var color = d3.scale.ordinal()
+      .range(["#ff8c00", "#8a89a6"]);
+
+  var xAxis = d3.svg.axis()
+      .scale(x0)
+      .orient("bottom");
+
+  var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left")
+      .tickFormat("");
+
+  console.log(data);
+  var categories = ["Player", "League"];
+  data.forEach(function(d) {
+    d.stats = categories.map(function(name) { return {name: name, value: d[name]}; });
+  });
+
+  x0.domain(data.map(function(d) { return d.Category; }));
+  x1.domain(categories).rangeRoundBands([0, x0.rangeBand()]);
+  y.domain([0, data[0].Player]); //d3.max(data, function(d) { return d3.max(d.stats, function(d) { return d.value; }); })
+
+  svg.append("g")
+      .attr("id", "xaxis")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .attr("font-size", "0px")
+      .transition().duration(800)
+      .attr("font-size", "15px")
+      .call(xAxis);
+
+  
+  d3.select("#xaxis")
+      .on("click", labelClick());
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "-10em")
+      .transition().duration(800)
+      .attr("font-size", "11px")
+      .attr("dy", ".45em")
+      .style("text-anchor", "end")
+      .text("Per Game Values");
+
+
+  var cats = svg.selectAll(".cats")
+      .data(data)
+      .enter().append("g")
+      .attr("class", "cats")
+      .attr("transform", function(d) { return "translate(" + x0(d.Category) + ",0)"; });
+
+  cats.selectAll("rect")
+      .data(function(d) { return d.stats; })
+      .enter().append("rect")
+      .attr("id", "bars")
+      .attr("stroke-width", 0)
+      .attr("width", x1.rangeBand())
+      .attr("x", function(d) { return x1(d.name); })
+      .attr("y", function(d) { return height; })
+      .attr("height", function(d) { return 0; })
+      .transition().duration(600)
+      .attr("height", function(d) { return height - y(d.value); })
+      .attr("y", function(d) { return y(d.value); })
+      .style("fill", function(d) { return color(d.name); });
+
+  // d3.select('#bars')
+  //   .on('click', labelClick());
+
+  cats.selectAll(".bartext")
+      .data(function(d) { return d.stats; })
+      .enter()
+      .append("text")
+      .attr("class", "bartext")
+      .attr("text-anchor", "middle")
+      .attr("fill", "black")
+      .attr("font-size", "0px")
+      .transition().duration(800)
+      .attr("font-size", "15px")
+      .attr("x", function(d) {
+          return x1(d.name)+x1.rangeBand()/2;
+      })
+      .attr("y", function(d) {
+          return y(d.value) - 2;
+      })
+      .text(function(d){
+           return parseFloat(d.value).toFixed(2);
+      });
+
+  var legend = svg.selectAll(".legend")
+      .data(categories.slice().reverse())
+      .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend.append("rect")
+      .attr("x", width - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+
+  legend.append("text")
+      .attr("id", "legendtext")
+      .attr("x", width - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .attr("font-size", "0px")
+      .transition().duration(800)
+      .attr("font-size", "15px")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+
+
+  
+
+}
+function labelClick(){
+  alert("Hello");
+}
+
+</script>
+</html>
