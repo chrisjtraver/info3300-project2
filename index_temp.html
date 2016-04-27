@@ -335,55 +335,54 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         d3.csv("data/player_stats/" + league.toLowerCase() + "/" + filename, function (error2, rows2) {
           var playerData = rows2;
           var wantedStats = [];
-          var actualSeason = parseInt(season) - 1;
+          var actualSeason = parseInt(season);
+          if(league == "NBA" || league == "NHL")
+            actualSeason -= 1
           //Get Stats from the Player's MVP Season
           for(var k = 0; k < playerData.length; k++){
-            if(playerData[k].Season.substring(0,4) == actualSeason.toString()){
+            var season_Year = "";
+            if(league == "NHL" || league == "NBA")
+              season_year = playerData[k].Season.substring(0,4)
+            else
+              season_year = playerData[k].Year.substring(0,4)
+
+            if(season_year == actualSeason.toString()){
               var temp = [];
               if(league == "NBA"){
 
-                wantedStats.push({
-                              Category: "Points",
-                              Player: playerData[k].PTS,
-                              League: 0,
-                              stats: temp
-                            });
-
-                wantedStats.push({
-                              Category: "Threes",
-                              Player: playerData[k].Threes,
-                              League: 0
-                            });
-
-                wantedStats.push({
-                              Category: "Rebounds",
-                              Player: playerData[k].TRB,
-                              League: 0
-                            });
-
-                wantedStats.push({
-                              Category: "Assists",
-                              Player: playerData[k].AST,
-                              League: 0
-                            });
-
-                wantedStats.push({
-                              Category: "Steals",
-                              Player: playerData[k].STL,
-                              League: 0
-                            });
-
-                wantedStats.push({
-                              Category: "Blocks",
-                              Player: playerData[k].BLK,
-                              League: 0
-                            });
-
-                wantedStats.push({
-                              Category: "eFG",
-                              Player: playerData[k].eFG_Percentage,
-                              League: 0
-                            });
+                wantedStats = [
+                              {Category: "Points", Player: playerData[k].PTS, League: 0, stats: temp},
+                              {Category: "Threes", Player: playerData[k].Threes, League: 0, stats: temp},
+                              {Category: "Rebounds", Player: playerData[k].TRB, League: 0, stats: temp},
+                              {Category: "Assists", Player: playerData[k].AST, League: 0, stats: temp},
+                              {Category: "Steals", Player: playerData[k].STL, League: 0, stats: temp},
+                              {Category: "Blocks", Player: playerData[k].BLK, League: 0, stats: temp},
+                              {Category: "eFG", Player: playerData[k].eFG_Percentage, League: 0, stats: temp}
+                              ];
+              }
+              else if(league == "MLB"){
+                if(position == "P"){
+                  wantedStats = [
+                                {Category: "Wins", Player: playerData[k].W, League: 0, stats: temp},
+                                {Category: "ERA", Player: playerData[k].ERA, League: 0, stats: temp},
+                                {Category: "Innings", Player: playerData[k].IP, League: 0, stats: temp},
+                                {Category: "Complete Game", Player: playerData[k].CG, League: 0, stats: temp},
+                                {Category: "Shutouts", Player: playerData[k].SHO, League: 0, stats: temp},
+                                {Category: "Strikeouts", Player: playerData[k].SO, League: 0, stats: temp},
+                                {Category: "WHIP", Player: playerData[k].WHIP, League: 0, stats: temp}
+                                ];
+                }
+                else{
+                  wantedStats = [
+                                {Category: "Hits", Player: playerData[k].H, League: 0, stats: temp},
+                                {Category: "Runs", Player: playerData[k].R, League: 0, stats: temp},
+                                {Category: "HR", Player: playerData[k].HR, League: 0, stats: temp},
+                                {Category: "SB", Player: playerData[k].SB, League: 0, stats: temp},
+                                {Category: "RBI", Player: playerData[k].RBI, League: 0, stats: temp},
+                                {Category: "BA", Player: playerData[k].BA, League: 0, stats: temp},
+                                {Category: "Slugging", Player: playerData[k].SLG, League: 0, stats: temp}
+                                ];
+                }
               }
               break;
             }
@@ -394,21 +393,41 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
             var averageData = rows3;
 
             for(var k = 0; k < averageData.length; k++){
-              if(averageData[k].Season.substring(0,4) == actualSeason.toString()){
+              var season_year = "";
+              if(league == "NHL" || league == "NBA")
+                season_year = averageData[k].Season.substring(0,4)
+              else
+                season_year = averageData[k].Year.substring(0,4)
+
+              if(season_year == actualSeason.toString()){
                 if(league == "NBA"){
                   wantedStats[0].League = averageData[k].PTS;
-
                   wantedStats[1].League = averageData[k].Threes;
-
                   wantedStats[2].League = averageData[k].TRB;
-
                   wantedStats[3].League = averageData[k].AST;
-
                   wantedStats[4].League = averageData[k].STL;
-
                   wantedStats[5].League = averageData[k].BLK;
-
                   wantedStats[6].League = averageData[k].eFG_Percentage;
+                }
+                else if(league == "MLB"){
+                  if(position == "P"){
+                    wantedStats[0].League = averageData[k].W;
+                    wantedStats[1].League = averageData[k].ERA;
+                    wantedStats[2].League = averageData[k].IP;
+                    wantedStats[3].League = averageData[k].CG;
+                    wantedStats[4].League = averageData[k].SHO;
+                    wantedStats[5].League = averageData[k].SO;
+                    wantedStats[6].League = averageData[k].WHIP;
+                  }
+                  else{
+                    wantedStats[0].League = averageData[k].H;
+                    wantedStats[1].League = averageData[k].R;
+                    wantedStats[2].League = averageData[k].HR;
+                    wantedStats[3].League = averageData[k].SB;
+                    wantedStats[4].League = averageData[k].RBI;
+                    wantedStats[5].League = averageData[k].BA;
+                    wantedStats[6].League = averageData[k].SLG;
+                  }
                 }
               }
             }
@@ -607,6 +626,8 @@ function mvp_avg_graph(svg, name, data){
       .call(xAxis);
 
   
+  d3.select("#xaxis")
+      .on("click", labelClick());
 
   svg.append("g")
       .attr("class", "y axis")
@@ -630,7 +651,8 @@ function mvp_avg_graph(svg, name, data){
 
   cats.selectAll("rect")
       .data(function(d) { return d.stats; })
-      .enter().append("rect").transition()
+      .enter().append("rect")
+      .attr("id", "bars")
       .attr("stroke-width", 0)
       .attr("width", x1.rangeBand())
       .attr("x", function(d) { return x1(d.name); })
@@ -640,6 +662,9 @@ function mvp_avg_graph(svg, name, data){
       .attr("height", function(d) { return height - y(d.value); })
       .attr("y", function(d) { return y(d.value); })
       .style("fill", function(d) { return color(d.name); });
+
+  // d3.select('#bars')
+  //   .on('click', labelClick());
 
   cats.selectAll(".bartext")
       .data(function(d) { return d.stats; })
