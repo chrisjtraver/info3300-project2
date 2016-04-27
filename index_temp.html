@@ -325,12 +325,8 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         var lastName = name.substring(spaceIndex+1, name.length);
         var filename;
 
-        if(league == "NFL"){
-          filename = firstName + "_";
-        }
-        else{
-          filename = firstName.toLowerCase() + "_" + lastName.toLowerCase() + ".csv";
-        }
+
+        filename = firstName.toLowerCase() + "_" + lastName.toLowerCase() + ".csv";
 
         d3.csv("data/player_stats/" + league.toLowerCase() + "/" + filename, function (error2, rows2) {
           var playerData = rows2;
@@ -384,6 +380,46 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
                                 ];
                 }
               }
+              else if(league == "NFL"){
+                if(position == "QB"){
+                  wantedStats = [
+                              {Category: "Comp%", Player: playerData[k].Cmp_Percentage, League: 0, stats: temp},
+                              {Category: "Yards", Player: playerData[k].Yds, League: 0, stats: temp},
+                              {Category: "TD", Player: playerData[k].TD, League: 0, stats: temp},
+                              {Category: "Int%", Player: playerData[k].Int_Percentage, League: 0, stats: temp},
+                              {Category: "Rating", Player: playerData[k].Rate, League: 0, stats: temp}
+                              ];
+                }
+                else{
+                  wantedStats = [
+                              {Category: "Rush Yds", Player: playerData[k].Rushing_Yds, League: 0, stats: temp},
+                              {Category: "Rush TD", Player: playerData[k].Rushing_TD, League: 0, stats: temp},
+                              {Category: "Y/A", Player: playerData[k].Rusing_Y_A, League: 0, stats: temp},
+                              {Category: "Rec Yds", Player: playerData[k].Receiving_Yds, League: 0, stats: temp},
+                              {Category: "Rec TD", Player: playerData[k].Receiving_TD, League: 0, stats: temp}
+                              ];
+                }
+              }
+              else
+                if(position == "G"){
+                  wantedStats = [
+                              {Category: "Wins", Player: playerData[k].W, League: 0, stats: temp},
+                              {Category: "Save%", Player: playerData[k].SV_Percentage, League: 0, stats: temp},
+                              {Category: "Avg GA", Player: playerData[k].GAA, League: 0, stats: temp},
+                              {Category: "Shutouts", Player: playerData[k].SO, League: 0, stats: temp},
+                              {Category: "Quality Start", Player: playerData[k].QS_Percentage, League: 0, stats: temp}
+                              ];
+                }
+                else{
+                  wantedStats = [
+                              {Category: "Goals", Player: playerData[k].G, League: 0, stats: temp},
+                              {Category: "Assists", Player: playerData[k].A, League: 0, stats: temp},
+                              {Category: "Points", Player: playerData[k].PTS, League: 0, stats: temp},
+                              {Category: "Plus Minus", Player: playerData[k].Plus_Minus, League: 0, stats: temp},
+                              {Category: "Hits", Player: playerData[k].HIT, League: 0, stats: temp},
+                              {Category: "Blocks", Player: playerData[k].BLK, League: 0, stats: temp}
+                              ];
+                }
               break;
             }
           }
