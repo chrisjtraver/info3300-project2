@@ -92,7 +92,7 @@ div.tooltip h4 {
 	position: absolute;
 	text-align: center;
 	margin: auto;
-	margin-top: 220px; /*change this to adjust vertical position of instructions*/
+	margin-top: 175px; /*change this to adjust vertical position of instructions*/
 	top: 0;
 	right: 0;
 	bottom: 0; 
