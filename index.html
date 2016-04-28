@@ -55,26 +55,20 @@
           <p>This graph explores the relationships between a variety of different characteristics about MVPs
           at the time they were awarded MVP.
           <br>Use the toggles below to interact with the data.</p><br>
-          <button>Grouped</button>
-          <button>Stacked</button><br><br>
-          <button>Height</button>
-          <button>Weight</button>
-          <button>Age</button>
-          <button>Salary</button>
-        </div>
-        <div class="col-xs-12 histogram" id="overall-stats">
-           <form id="groupStackForm">
-            <label><input type="radio" name="mode" value="grouped"> Grouped</label>
-            <label><input type="radio" name="mode" value="stacked" checked> Stacked</label>
+          <form id="groupStackForm">
+            <button type="button" class="histogramButton" value="grouped">Grouped</button>
+            <button type="button" class="histogramButton" value="stacked">Stacked</button>
           </form>
-          <br>
+          <br><br>
           <form id="categoryForm">
-            <label><input type="radio" name="category" value="Height"> Height</label>
-            <label><input type="radio" name="category" value="Weight"> Weight</label>
-            <label><input type="radio" name="category" value="Age" checked> Age</label>
-            <label><input type="radio" name="category" value="Salary"> Salary</label>
+            <button type="button" class="histogramButton" value="Height">Height</button>
+            <button type="button" class="histogramButton" value="Weight">Weight</button>
+            <button type="button" class="histogramButton" value="Age">Age</button>
+            <button type="button" class="histogramButton" value="Salary">Salary</button>
           </form>
+          
         </div>
+        <div class="col-xs-12 histogram" id="overall-stats"></div>
     </div>
 </div> 
 
@@ -587,7 +581,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
   mvp_data = rows;
 
   var color = d3.scale.category10();
-  //ensures order of coloring
+  //ensures consistent order of coloring
   var leagues = ["NBA", "NFL", "NHL", "MLB"];
 
   var margin = {top: 40, right: 50, bottom: 50, left: 50},
@@ -611,18 +605,25 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
 
   var yScale, xScale, labelScale, rect, layer, yAxis, xAxis, layers, yGroupMax, yStackMax, numBins, category;
 
-  d3.selectAll("input").on("change", change);
-
+  var currentMode = "stacked";
+  var category = "Age";
   initCategory();
 
-  function change() {
+  d3.selectAll(".histogramButton").on("click",function() {
     switch (this.value) {
-      case "grouped": transitionGrouped(); break;
-      case "stacked": transitionStacked(); break;
+      case "grouped": 
+        currentMode = this.value;
+        transitionGrouped(); 
+        break;
+      case "stacked": 
+        currentMode = this.value;
+        transitionStacked(); 
+        break;
       default:
+        category = this.value;
         transitionCategory();
     }
-  }
+  });
 
   function transitionGrouped() {
     yScale.domain([0, yGroupMax]);
@@ -678,7 +679,6 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
 
   function getData() {
     var categoryToBins= {Age: 10, Height: 10, Weight: 10, Salary: 10};
-    category = d3.select('input[name="category"]:checked').node().value;
     var dataMod = (category==="Salary")?1/100000:1;
     var endSubtractor = {Age: 1, Height: .1, Weight: 1, Salary: 100000};
     numBins = categoryToBins[category];
@@ -828,8 +828,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
         .attr("width", xScale.rangeBand()/4)
         .attr("height",20);
 
-    var mode = d3.select('input[name="mode"]:checked').node().value;
-    if (mode==="grouped") {
+    if (currentMode==="grouped") {
       yScale.domain([0, yGroupMax]);
       d3.selectAll(".yAxis").remove();
       histogram.append("g")
