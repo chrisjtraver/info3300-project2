@@ -78,60 +78,60 @@
 </body>
 
 <script>
-
+  
 var width = 1600,
-    height = 400,
-    scale0 = (width - 1) / 2 / Math.PI;
+  height = 400,
+  scale0 = (width - 1) / 2 / Math.PI;
 
 var projection = d3.geo.mercator();
 
 var zoom = d3.behavior.zoom()
-    .translate([width / 2, height / 2])
-    .scale(scale0)
-    .scaleExtent([scale0,   24 * scale0])
-    .on("zoom", zoomed);
+  .translate([width / 2, height / 2])
+  .scale(scale0)
+  .scaleExtent([scale0, 24 * scale0])
+  .on("zoom", zoomed);
 
 var path = d3.geo.path()
-    .projection(projection);
+  .projection(projection);
 
 var svg = d3.select("#mvp-picker").append("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .attr("class", "map")
+  .attr("width", width)
+  .attr("height", height)
+  .attr("class", "map")
   .append("g");
 
 var g = svg.append("g");
 
 var tip = d3.select(".interactive-map").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
-    
+  .attr("class", "tooltip")
+  .style("opacity", 0);
+
 svg.append("rect")
-    .attr("class", "overlay")
-    .attr("width", width)
-    .attr("height", height);
+  .attr("class", "overlay")
+  .attr("width", width)
+  .attr("height", height);
 
 svg
-    .call(zoom)
-    .call(zoom.event);
+  .call(zoom)
+  .call(zoom.event);
 
 d3.json("resources/world-110m.json", function(error, world) {
   if (error) throw error;
 
   g.append("path")
-      .datum({type: "Sphere"})
-      .attr("class", "sphere")
-      .attr("d", path);
+    .datum({ type: "Sphere" })
+    .attr("class", "sphere")
+    .attr("d", path);
 
   g.append("path")
-      .datum(topojson.merge(world, world.objects.countries.geometries))
-      .attr("class", "land")
-      .attr("d", path);
+    .datum(topojson.merge(world, world.objects.countries.geometries))
+    .attr("class", "land")
+    .attr("d", path);
 
   g.append("path")
-      .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
-      .attr("class", "boundary")
-      .attr("d", path);
+    .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b;}))
+    .attr("class", "boundary")
+    .attr("d", path);
 
 });
 
@@ -139,391 +139,352 @@ d3.json("resources/world-110m.json", function(error, world) {
 rightWidth = 500;
 rightHeight = 500;
 var rightWindow = d3.select("#mvp-stats").append("svg")
-    .attr("width", rightWidth)
-    .attr("height", rightHeight)
+  .attr("width", rightWidth)
+  .attr("height", rightHeight)
   .append("g");
 
 rightWindow.append("text")
-            .text("Hello")
-            .attr("x", rightWidth/2)
-            .attr("text-anchor", "middle")
-            .attr("y", rightHeight*.1)
-            .attr("font-size", "50px")
-            .attr("id", "rightTitle");
+  .text("Hello")
+  .attr("x", rightWidth / 2)
+  .attr("text-anchor", "middle")
+  .attr("y", rightHeight * .1)
+  .attr("font-size", "50px")
+  .attr("id", "rightTitle");
 
 function zoomed() {
   projection
-      .translate(zoom.translate())
-      .scale(zoom.scale());
+    .translate(zoom.translate())
+    .scale(zoom.scale());
 
   g.selectAll("path")
-      .attr("d", path);
+    .attr("d", path);
 
-  svg.selectAll("image").attr("x", function(d) {return projection([d.Longitude, d.Latitude])[0]})
-  .attr("y", function(d) {return projection([d.Longitude, d.Latitude])[1]})
+  svg.selectAll("image").attr("x", function(d) {
+      return projection([d.Longitude, d.Latitude])[0]
+    })
+    .attr("y", function(d) {
+      return projection([d.Longitude, d.Latitude])[1]
+    })
 }
 
 d3.select(self.frameElement).style("height", height + "px");
 
 var mvp_data;
 
-d3.csv("data/mvp_list.csv", function (error, rows) {
-  
+d3.csv("data/mvp_list.csv", function(error, rows) {
+
   mvp_data = rows;
-  
+
   function remove_duplicates(c, optArray) {
     var mvp_data = rows;
-    if (optArray) {mvp_data = optArray}
+    if (optArray) { mvp_data = optArray }
     mvp_data_copy = [];
     var set = new Set();
-    
-    if (c=="College") {
-      for(var k = 0; k < mvp_data.length; k++){
-        if(set.has(mvp_data[k].College)){
+
+    if (c == "College") {
+      for (var k = 0; k < mvp_data.length; k++) {
+        if (set.has(mvp_data[k].College)) {
           continue;
-        }
-        else{
+        } else {
           mvp_data_copy.push(mvp_data[k]);
           set.add(mvp_data[k].College);
         }
-      }        
+      }
     }
-    if (c=="Player") {
-      for(var k = 0; k < mvp_data.length; k++){
-        if(set.has(mvp_data[k].Player)){
+    if (c == "Player") {
+      for (var k = 0; k < mvp_data.length; k++) {
+        if (set.has(mvp_data[k].Player)) {
           continue;
-        }
-        else{
+        } else {
           mvp_data_copy.push(mvp_data[k]);
           set.add(mvp_data[k].Player);
         }
-      }        
+      }
     }
-    if (c=="Team") {
-      for(var k = 0; k < mvp_data.length; k++){
-        if(set.has(mvp_data[k].Team)){
+    if (c == "Team") {
+      for (var k = 0; k < mvp_data.length; k++) {
+        if (set.has(mvp_data[k].Team)) {
           continue;
-        }
-        else{
+        } else {
           mvp_data_copy.push(mvp_data[k]);
           set.add(mvp_data[k].Team);
         }
-      }        
+      }
     }
-    if (c=="Hometown") {
-      for(var k = 0; k < mvp_data.length; k++){
-        if(set.has(mvp_data[k].Hometown)){
+    if (c == "Hometown") {
+      for (var k = 0; k < mvp_data.length; k++) {
+        if (set.has(mvp_data[k].Hometown)) {
           continue;
-        }
-        else{
+        } else {
           mvp_data_copy.push(mvp_data[k]);
           set.add(mvp_data[k].Hometown);
         }
-      }        
+      }
     }
-    if (c=="League") {
-      for(var k = 0; k < mvp_data.length; k++){
-        if(set.has(mvp_data[k].League)){
+    if (c == "League") {
+      for (var k = 0; k < mvp_data.length; k++) {
+        if (set.has(mvp_data[k].League)) {
           continue;
-        }
-        else{
+        } else {
           mvp_data_copy.push(mvp_data[k]);
           set.add(mvp_data[k].League);
         }
-      }        
+      }
     }
     return mvp_data_copy;
   }
 
-  var playerPointsNoDup = svg.selectAll(".playerPoints").data(remove_duplicates("Player"), function(d) {return d.ID;});
-  
+  var playerPointsNoDup =
+    svg.selectAll(".playerPoints").data(remove_duplicates("Player"), function(d) { return d.ID; });
+
   playerPointsNoDup
     .enter().append("image")
-    .attr("x", function(d) {return projection([d.Longitude, d.Latitude])[0];})
-    .attr("y", function(d) {return projection([d.Longitude, d.Latitude])[1];})
-    .attr("name", function(d) {return d.Player;})
-    .attr("hometown", function(d) {return d.Hometown;})
-    .attr("age", function(d) {return d.Age;})
-    .attr("pheight", function(d) {return d.Height;})
-    .attr("weight", function(d) {return d.Weight;})
-    .attr("team", function(d) {return d.Team;})
-    .attr("college", function(d) {return d.College;})
-    .attr("salary", function(d) {return d.Salary;})
-    .attr("position", function(d) {return d.Position;})
+    .attr("x", function(d) { return projection([d.Longitude, d.Latitude])[0]; })
+    .attr("y", function(d) { return projection([d.Longitude, d.Latitude])[1]; })
+    .attr("name", function(d) { return d.Player; })
+    .attr("hometown", function(d) { return d.Hometown; })
+    .attr("age", function(d) { return d.Age; })
+    .attr("pheight", function(d) { return d.Height; })
+    .attr("weight", function(d) { return d.Weight; })
+    .attr("team", function(d) { return d.Team; })
+    .attr("college", function(d) { return d.College; })
+    .attr("salary", function(d) { return d.Salary; })
+    .attr("position", function(d) { return d.Position; })
     .attr("width", 20)
     .attr("height", 20)
     .style("opacity", "0.4")
-    .attr("xlink:href", function (d) {
-          if (d.League == "MLB") {
-              return "resources/images/mlb.png";
-          }                  
-          if (d.League == "NHL") {
-              return "resources/images/nhl.png";
-          }
-          if (d.League == "NBA") {
-              return "resources/images/nba.png";
-          }
-          if (d.League == "NFL") {
-              return "resources/images/nfl.png";
-          }
+    .attr("xlink:href", function(d) {
+      if (d.League == "MLB") { return "resources/images/mlb.png"; }
+      if (d.League == "NHL") { return "resources/images/nhl.png"; }
+      if (d.League == "NBA") { return "resources/images/nba.png"; }
+      if (d.League == "NFL") { return "resources/images/nfl.png"; }
     });
 
-  playerPointsNoDup.on('mouseover',function(){
-        var curr = d3.select(this);
-        curr.style("opacity", "0.7");
-        var name = curr.attr("name");
-        var age = curr.attr("age");
-        var hometown = curr.attr("hometown");
-        var salary = curr.attr("salary");
-        var weight = curr.attr("weight");
-        var playerHeight = curr.attr("pheight");
-        var team = curr.attr("team");
-        var college = curr.attr("college");
-        var position = curr.attr("position");
-        //svg.append("text")
-        //  .text(name + ' - ' + hometown)
-        //  .attr("x", width/2)
-        //  .attr("text-anchor", "middle")
-        //  .attr("y", height*.95)
-        //  .style("font-size", "20px")
-        //  .attr("stroke","black")
-        //  .attr("id","playerLabel");
+  playerPointsNoDup.on('mouseover', function() {
+    var curr = d3.select(this);
+    curr.style("opacity", "0.7");
+    var name = curr.attr("name");
+    var age = curr.attr("age");
+    var hometown = curr.attr("hometown");
+    var salary = curr.attr("salary");
+    var weight = curr.attr("weight");
+    var playerHeight = curr.attr("pheight");
+    var team = curr.attr("team");
+    var college = curr.attr("college");
+    var position = curr.attr("position");
 
-        name.split(' ').join('_')
-        tip.transition()    
-                .duration(200)    
-                .style("opacity", .9);    
-        tip.html("<img src='resources/images/player-photos/" + name.toLowerCase().split(' ').join('_') + ".jpg'" +
-                  "style='float: left;',  height=160, width=130> <h4>"
-                  + name + "</h4>" + "<br/>"  +
-                  "<strong><u>Hometown:</u></strong>  " + hometown + "<br/>" + 
-                  "<strong><u>Team:</u></strong>  " + team + "<br/>" + 
-                  "<strong><u>Position:</u></strong>  " + position + "<br/>" + 
-                  "<strong><u>Age:</u></strong>  " + age + "<br/>" + 
-                  "<strong><u>Height:</u></strong>  " + playerHeight + "<br/>" + 
-                  "<strong><u>Weight:</u></strong>  " + weight + " lbs<br/>" +
-                  "<strong><u>College:</u></strong>  " + college + "<br/>" + 
-                  "<strong><u>Salary:</u></strong>  $" + salary + "<br/>")
-            .style("left", (d3.event.pageX) + "px")   
-            .style("top", (d3.event.pageY - 28) + "px");  
+    name.split(' ').join('_')
+    tip.transition().duration(200).style("opacity", .9);
+    
+    tip.html("<img src='resources/images/player-photos/" + name.toLowerCase().split(' ').join('_') + ".jpg'" +
+        "style='float: left;',  height=160, width=130> <h4>" +
+        name + "</h4>" + "<br/>" +
+        "<strong><u>Hometown:</u></strong>  " + hometown + "<br/>" +
+        "<strong><u>Team:</u></strong>  " + team + "<br/>" +
+        "<strong><u>Position:</u></strong>  " + position + "<br/>" +
+        "<strong><u>Age:</u></strong>  " + age + "<br/>" +
+        "<strong><u>Height:</u></strong>  " + playerHeight + "<br/>" +
+        "<strong><u>Weight:</u></strong>  " + weight + " lbs<br/>" +
+        "<strong><u>College:</u></strong>  " + college + "<br/>" +
+        "<strong><u>Salary:</u></strong>  $" + salary + "<br/>")
+      .style("left", (d3.event.pageX) + "px")
+      .style("top", (d3.event.pageY - 28) + "px");
   });
-            
-  playerPointsNoDup.on('mouseout',function(){
-				d3.select(this).style("opacity", "0.4");
-        svg.select("#playerLabel").remove();
-        tip.transition()    
-                .duration(500)    
-                .style("opacity", 0); 
-	});
 
-  playerPointsNoDup.on('click',function(){
-        var curr = d3.select(this);
-        var name = curr.attr("name");
-        rightWindow.select("#rightTitle")
-                    .text(name);
-
+  playerPointsNoDup.on('mouseout', function() {
+    d3.select(this).style("opacity", "0.4");
+    svg.select("#playerLabel").remove();
+    tip.transition().duration(500).style("opacity", 0);
   });
-  
+
+  playerPointsNoDup.on('click', function() {
+    var curr = d3.select(this);
+    var name = curr.attr("name");
+    rightWindow.select("#rightTitle").text(name);
+  });
+
   d3.select("#instructions-close").on("click", function() {
-      d3.select("#instructions").remove();
+    d3.select("#instructions").remove();
   });
 
+  var margin = {
+      top: 20,
+      right: 100,
+      bottom: 100,
+      left: 150
+    },
+    width = 1260 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
-  var margin = {top: 20, right: 100, bottom: 100, left: 150},
-  width = 1260 - margin.left - margin.right,
-  height = 500 - margin.top - margin.bottom;
+  var x = d3.scale.linear().range([0, width]);
 
-  var x = d3.scale.linear()
-    .range([0, width]);
-
-  var y = d3.scale.linear()
-    .range([height, 0]);
+  var y = d3.scale.linear().range([height, 0]);
 
   var color = d3.scale.category10();
 
-  var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
+  var xAxis = d3.svg.axis().scale(x).orient("bottom");
 
-  var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left");
+  var yAxis = d3.svg.axis().scale(y).orient("left");
 
   var scatterplot = d3.select(".scatterplot").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
+    .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   // Define the div for the tooltip
-  var div = d3.select(".scatterplot").append("div")	
-    .attr("class", "scatterplot-tooltip")				
+  var div = d3.select(".scatterplot").append("div")
+    .attr("class", "scatterplot-tooltip")
     .style("opacity", 0);
-    
+
   x.domain(d3.extent(rows, function(d) { return Number(d.Age); })).nice();
   y.domain(d3.extent(rows, function(d) { return Number(d.Salary); })).nice();
 
   scatterplot.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis)
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis)
     .append("text")
-      .attr("class", "label")
-      .attr("x", width)
-      .attr("y", -6)
-      .style("text-anchor", "end")
-      .text("Age (yrs)");
+    .attr("class", "label")
+    .attr("x", width)
+    .attr("y", -6)
+    .style("text-anchor", "end")
+    .text("Age (yrs)");
 
   scatterplot.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
+    .attr("class", "y axis")
+    .call(yAxis)
     .append("text")
-      .attr("class", "label")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Salary ($)")
+    .attr("class", "label")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    .style("text-anchor", "end")
+    .text("Salary ($)")
 
   format = d3.format("0,000");
 
-  var dots = scatterplot.selectAll(".dot").data(mvp_data, function(d) {return d.ID;});
+  var dots = scatterplot.selectAll(".dot").data(mvp_data, function(d) { return d.ID; });
   dots.enter().append("circle")
-      .attr("class", function(d) { return "dot " + d.Team + " " + d.College.split(' ').join('_')})
-      .attr("r", 3.5)
-      .attr("cx", function(d) { return x(Number(d.Age)); })
-      .attr("cy", function(d) { return y(Number(d.Salary)); })
-      .style("fill", function(d) { return color(d.League); })
-      .on("mouseover", function(d) {		
-            d.Player.split(' ').join('_')
-            tip.transition()    
-                    .duration(200)    
-                    .style("opacity", .9);    
-            tip.html("<img src='resources/images/player-photos/" + d.Player.toLowerCase().split(' ').join('_') + ".jpg'" +
-                      "style='float: left;',  height=160, width=130> <h4>"
-                      + d.Player + "</h4>" + "<br/>"  +
-                      "<strong><u>Hometown:</u></strong>  " + d.Hometown + "<br/>" + 
-                      "<strong><u>Team:</u></strong>  " + d.Team + "<br/>" + 
-                      "<strong><u>Position:</u></strong>  " + d.Position + "<br/>" + 
-                      "<strong><u>Age:</u></strong>  " + d.Age + "<br/>" + 
-                      "<strong><u>Height:</u></strong>  " + d.Height + "<br/>" + 
-                      "<strong><u>Weight:</u></strong>  " + d.Weight + " lbs<br/>" +
-                      "<strong><u>College:</u></strong>  " + d.College + "<br/>" + 
-                      "<strong><u>Salary:</u></strong>  $" + d.Salary + "<br/>")
-                .style("left", (d3.event.pageX) + "px")   
-                .style("top", (d3.event.pageY - 28) + "px");
-      })
-        .on("mouseout", function(d) {		
-            tip.transition()		
-                .duration(500)		
-                .style("opacity", 0);	
-      });
+    .attr("class", function(d) { return "dot " + d.Team + " " + d.College.split(' ').join('_') })
+    .attr("r", 3.5)
+    .attr("cx", function(d) { return x(Number(d.Age)); })
+    .attr("cy", function(d) { return y(Number(d.Salary)); })
+    .style("fill", function(d) { return color(d.League); })
+    .on("mouseover", function(d) {
+      d.Player.split(' ').join('_')
+      tip.transition().duration(200).style("opacity", .9);
+      tip.html("<img src='resources/images/player-photos/" + d.Player.toLowerCase().split(' ').join('_') + ".jpg'" +
+          "style='float: left;',  height=160, width=130> <h4>" +
+          d.Player + "</h4>" + "<br/>" +
+          "<strong><u>Hometown:</u></strong>  " + d.Hometown + "<br/>" +
+          "<strong><u>Team:</u></strong>  " + d.Team + "<br/>" +
+          "<strong><u>Position:</u></strong>  " + d.Position + "<br/>" +
+          "<strong><u>Age:</u></strong>  " + d.Age + "<br/>" +
+          "<strong><u>Height:</u></strong>  " + d.Height + "<br/>" +
+          "<strong><u>Weight:</u></strong>  " + d.Weight + " lbs<br/>" +
+          "<strong><u>College:</u></strong>  " + d.College + "<br/>" +
+          "<strong><u>Salary:</u></strong>  $" + d.Salary + "<br/>")
+        .style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY - 28) + "px");
+    })
+    .on("mouseout", function(d) {
+      tip.transition().duration(500).style("opacity", 0);
+    });
 
 
   var legend = scatterplot.selectAll(".legend")
-      .data(color.domain())
+    .data(color.domain())
     .enter().append("g")
-      .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+    .attr("class", "legend")
+    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
   legend.append("rect")
-      .attr("x", width - 18)
-      .attr("width", 18)
-      .attr("height", 18)
-      .style("fill", color);
+    .attr("x", width - 18)
+    .attr("width", 18)
+    .attr("height", 18)
+    .style("fill", color);
 
   legend.append("text")
-      .attr("x", width - 24)
-      .attr("y", 9)
-      .attr("dy", ".35em")
-      .style("text-anchor", "end")
-      .text(function(d) { return d; });
-   
-  var collegeDropDown = d3.select(".college-dropdown").append("select")
-                    .attr("name", "college-list");
-  var teamDropDown = d3.select(".team-dropdown").append("select")
-                    .attr("name", "team-list");
-  var leagueDropDown = d3.select(".sport-dropdown").append("select")
-                    .attr("name", "sport-list"); 
-  
+    .attr("x", width - 24)
+    .attr("y", 9)
+    .attr("dy", ".35em")
+    .style("text-anchor", "end")
+    .text(function(d) { return d; });
 
+  var collegeDropDown = d3.select(".college-dropdown").append("select").attr("name", "college-list");
+  var teamDropDown = d3.select(".team-dropdown").append("select").attr("name", "team-list");
+  var leagueDropDown = d3.select(".sport-dropdown").append("select").attr("name", "sport-list");
 
   var colleges = remove_duplicates("College");
   var teams = remove_duplicates("Team");
   var leagues = remove_duplicates("League");
-  var allobject = {Age:"-- All --",
-    College:"-- All --",
-    Height:"-- All --",
-    Hometown:"-- All --",
-    Latitude:"-- All --",
-    League:"-- All --",
-    Longitude:"-- All --",
-    Player:"-- All --",
-    Position:"-- All --",
-    Salary:"-- All --",
-    Season:"-- All --",
-    Subleague:"-- All --",
-    Team:"-- All --",
-    Weight:"-- All --"
+  var allobject = {
+    Age: "-- All --",
+    College: "-- All --",
+    Height: "-- All --",
+    Hometown: "-- All --",
+    Latitude: "-- All --",
+    League: "-- All --",
+    Longitude: "-- All --",
+    Player: "-- All --",
+    Position: "-- All --",
+    Salary: "-- All --",
+    Season: "-- All --",
+    Subleague: "-- All --",
+    Team: "-- All --",
+    Weight: "-- All --"
   };
+  
   colleges.unshift(allobject);
   teams.unshift(allobject);
   leagues.unshift(allobject);
-  var collegeOptions = collegeDropDown.selectAll("option")
-           .data(colleges)
-         .enter()
-           .append("option");
-  var teamOptions = teamDropDown.selectAll("option")
-           .data(teams)
-         .enter()
-           .append("option");
-  var leagueOptions = leagueDropDown.selectAll("option")
-           .data(leagues)
-         .enter()
-           .append("option");
-           
-  collegeOptions.text(function (d) { return d.College; })
-      .attr("value", function (d) { return d.College; })
-      .attr("id", function (d) { return d.College.split(' ').join('_'); });
-  teamOptions.text(function (d) { return d.Team; })
-      .attr("value", function (d) { return d.Team; })
-      .attr("id", function (d) { return d.Team.split(' ').join('_'); });
-  leagueOptions.text(function (d) { return d.League; })
-      .attr("value", function (d) { return d.League; })
-      .attr("id", function (d) { return d.League.split(' ').join('_'); });
+  
+  var collegeOptions = collegeDropDown.selectAll("option").data(colleges).enter().append("option");
+  var teamOptions = teamDropDown.selectAll("option").data(teams).enter().append("option");
+  var leagueOptions = leagueDropDown.selectAll("option").data(leagues).enter().append("option");
+
+  collegeOptions.text(function(d) { return d.College; })
+    .attr("value", function(d) { return d.College;})
+    .attr("id", function(d) { return d.College.split(' ').join('_');});
+  teamOptions.text(function(d) { return d.Team; })
+    .attr("value", function(d) { return d.Team; })
+    .attr("id", function(d) { return d.Team.split(' ').join('_'); });
+  leagueOptions.text(function(d) { return d.League; })
+    .attr("value", function(d) { return d.League; })
+    .attr("id", function(d) { return d.League.split(' ').join('_'); });
 
   collegeDropDown.on("change", filterHandlerCollege);
   teamDropDown.on("change", filterHandlerTeam);
   leagueDropDown.on("change", filterHandlerLeague);
 
-  function filterHandlerCollege() {
-    filterDots("College");
-  }
-  function filterHandlerTeam() {
-    filterDots("Team");
-  }
-  function filterHandlerLeague() {
-    filterDots("League");
-  }
+  function filterHandlerCollege() { filterDots("College"); }
+  function filterHandlerTeam() { filterDots("Team"); }
+  function filterHandlerLeague() { filterDots("League"); }
 
-  function filterDots(typeChanged) {
+  function filterDots(typeChanged, resetFlag) {
     var college = collegeDropDown.node().value;
     var team = teamDropDown.node().value;
     var league = leagueDropDown.node().value;
+    if (resetFlag) {
+        college = "-- All --";
+        team = "-- All --";
+        league = "-- All --";
+    }
 
-    var newData = mvp_data.filter( function(d) {
+    var newData = mvp_data.filter(function(d) {
       return (d.College == college || college == "-- All --") &&
-             (d.Team == team || team == "-- All --") &&
-             (d.League == league || league == "-- All --"); 
+        (d.Team == team || team == "-- All --") &&
+        (d.League == league || league == "-- All --");
     });
-    dots = scatterplot.selectAll(".dot").data(newData, function(d) {return d.ID;});
+    dots = scatterplot.selectAll(".dot").data(newData, function(d) { return d.ID; });
     dots.enter();
-    dots.attr("display","inline");
-    dots.exit().attr("display","none");
+    dots.attr("display", "inline");
+    dots.exit().attr("display", "none");
 
-    var newColleges = remove_duplicates("College",newData);
-    var newTeams = remove_duplicates("Team",newData);
-    var newLeagues = remove_duplicates("League",newData);
+    var newColleges = remove_duplicates("College", newData);
+    var newTeams = remove_duplicates("Team", newData);
+    var newLeagues = remove_duplicates("League", newData);
 
     newColleges.unshift(allobject);
     newTeams.unshift(allobject);
@@ -536,63 +497,54 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
     leagueOptions = leagueDropDown.selectAll("option").data(newLeagues);
     leagueOptions.enter().append("option");
 
-    collegeOptions.text(function (d) { return d.College; })
-        .attr("value", function (d) { return d.College; })
-        .attr("id", function (d) { return d.College.split(' ').join('_'); })
-        .attr("class", function (d) { return d.College.split(' ').join('_'); });
-    teamOptions.text(function (d) { return d.Team; })
-        .attr("value", function (d) { return d.Team; })
-        .attr("id", function (d) { return d.Team.split(' ').join('_'); })
-        .attr("class", function (d) { return d.Team.split(' ').join('_'); });
-    leagueOptions.text(function (d) { return d.League; })
-        .attr("value", function (d) { return d.League; })
-        .attr("id", function (d) { return d.League.split(' ').join('_'); })
-        .attr("class", function (d) { return d.League.split(' ').join('_'); });
-        
+    collegeOptions.text(function(d) { return d.College; })
+      .attr("value", function(d) { return d.College; })
+      .attr("id", function(d) { return d.College.split(' ').join('_'); })
+      .attr("class", function(d) { return d.College.split(' ').join('_'); });
+    teamOptions.text(function(d) { return d.Team; })
+      .attr("value", function(d) { return d.Team; })
+      .attr("id", function(d) { return d.Team.split(' ').join('_'); })
+      .attr("class", function(d) { return d.Team.split(' ').join('_'); });
+    leagueOptions.text(function(d) { return d.League; })
+      .attr("value", function(d) { return d.League; })
+      .attr("id", function(d) { return d.League.split(' ').join('_'); })
+      .attr("class", function(d) { return d.League.split(' ').join('_');});
+
     collegeOptions.exit().remove();
     teamOptions.exit().remove();
     leagueOptions.exit().remove();
 
     switch (typeChanged) {
       case "College":
-        d3.select('#'+college.split(' ').join('_')).property("selected", "selected");
+        d3.select('#' + college.split(' ').join('_')).property("selected", "selected");
         break;
       case "Team":
-        d3.select('#'+team.split(' ').join('_')).property("selected", "selected");
+        d3.select('#' + team.split(' ').join('_')).property("selected", "selected");
         break;
       case "League":
-        d3.select('#'+league.split(' ').join('_')).property("selected", "selected");
+        d3.select('#' + league.split(' ').join('_')).property("selected", "selected");
         break;
       default:
         console.log(typeChanged);
     }
-    
-
   }
 
   resetbutton = d3.select("#reset-button")
   resetbutton.on("click", function() {
-    console.log("rect");
-    selection = d3.selectAll(".--_All_--")
-    selection.property("selected", "selected")
-    console.log(selection)
-    d3.event.stopPropagation();
+    filterDots(null, 1);
   });
 
 });
-
 </script>
-
-
 
 
 <script>
 
-var width = 750,
-    height = 500;
+var width = 750, height = 500;
 
 var mvp_data;
 var probe;
+
 d3.csv("data/mvp_list.csv", function (error, rows) {
   
   mvp_data = rows;
@@ -703,10 +655,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
     var maxMin = d3.extent(mvp_data, function (row) {return Number(row[category]);}),
       range = maxMin[1]-maxMin[0];
 
-    var MLBBins=[],
-      NFLBins=[],
-      NBABins=[],
-      NHLBins=[];
+    var MLBBins=[], NFLBins=[], NBABins=[], NHLBins=[];
     for (var i = numBins; i >= 0; i--) {
       var begin = i*(range/numBins)+maxMin[0],
         end = (i+1)*(range/numBins)+maxMin[0]-endSubtractor[category];
