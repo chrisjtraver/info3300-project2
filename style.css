@@ -56,8 +56,26 @@ body {
 
 #mvp-stats {
 	background: #e1e1e1;
-	height: 500px;
+	height: 120px;
 	overflow: visible;
+	padding-top: 10px;
+}
+
+.player-visualizations {
+	overflow: hidden;
+}
+
+.player-visualizations2 {
+	overflow: hidden;
+}
+#mvp-graphs {
+	background: #e1e1e1;
+}
+
+#mvp-trophies {
+	background: #e1e1e1;
+	overflow: scroll;
+	width: 670px;
 }
 
 #title {
