@@ -48,7 +48,8 @@
         <div class="col-xs-12 scatterplot-dropdowns">
           <h3 class="blue">Age & Salary Comparison</h3>
           <p>This graph explores the relationship between salary and a player's age at the time they were awarded MVP.
-          <br>Hover over a datapoint to learn more about that MVP and use the interactive filters below to examine trends between different Colleges, Teams, and Sports.</p><br>
+          <br>Hover over a datapoint to learn more about that MVP and use the interactive filters below to examine trends
+          between different Colleges, Teams, and Sports.</p><br>
           <form>
           <span><strong>Filter By College: </strong></span><span class="college-dropdown"></span>
           <span><strong>Filter By Team: </strong></span><span class="team-dropdown"></span>
@@ -61,7 +62,8 @@
           <h3 class="blue">MVP Characteristic Distributions</h3>
           <p>This graph explores the relationships between a variety of different characteristics about MVPs
           at the time they were awarded MVP.
-          <br>Use the toggles below to interact with the data. "Grouped" shows differences between individual sports, while "Stacked" shows cumulative trends for all sports combined.</p><br>
+          <br>Use the toggles below to interact with the data. "Grouped" shows differences between individual sports, while
+          "Stacked" shows cumulative trends for all sports combined.</p><br>
           <form id="groupStackForm">
             <strong>Bar Arrangement</strong><br>
             <button type="button" class="histogramButton" value="grouped">Grouped</button>
@@ -75,7 +77,6 @@
             <button type="button" class="histogramButton" value="Age">Age</button>
             <button type="button" class="histogramButton" value="Salary">Salary</button>
           </form>
-          
         </div>
         <div class="col-xs-12 histogram" id="overall-stats"></div>
     </div>
@@ -86,58 +87,58 @@
 <script>
   
 var width = 1600,
-    height = 400,
-    scale0 = (width - 1) / 2 / Math.PI;
+  height = 400,
+  scale0 = (width - 1) / 2 / Math.PI;
 
 var projection = d3.geo.mercator();
 
 var zoom = d3.behavior.zoom()
-    .translate([width / 2, height / 2])
-    .scale(scale0)
-    .scaleExtent([scale0,   18 * scale0])
-    .on("zoom", zoomed);
+  .translate([width / 2, height / 2])
+  .scale(scale0)
+  .scaleExtent([scale0, 24 * scale0])
+  .on("zoom", zoomed);
 
 var path = d3.geo.path()
-    .projection(projection);
+  .projection(projection);
 
 var svg = d3.select("#mvp-picker").append("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .attr("class", "map")
+  .attr("width", width)
+  .attr("height", height)
+  .attr("class", "map")
   .append("g");
 
 var g = svg.append("g");
 
 var tip = d3.select(".interactive-map").append("div")
-            .attr("class", "tooltip")
-            .style("opacity", 0);
-    
+  .attr("class", "tooltip")
+  .style("opacity", 0);
+
 svg.append("rect")
-    .attr("class", "overlay")
-    .attr("width", width)
-    .attr("height", height);
+  .attr("class", "overlay")
+  .attr("width", width)
+  .attr("height", height);
 
 svg
-    .call(zoom)
-    .call(zoom.event);
+  .call(zoom)
+  .call(zoom.event);
 
 d3.json("resources/world-110m.json", function(error, world) {
   if (error) throw error;
 
   g.append("path")
-      .datum({type: "Sphere"})
-      .attr("class", "sphere")
-      .attr("d", path);
+    .datum({ type: "Sphere" })
+    .attr("class", "sphere")
+    .attr("d", path);
 
   g.append("path")
-      .datum(topojson.merge(world, world.objects.countries.geometries))
-      .attr("class", "land")
-      .attr("d", path);
+    .datum(topojson.merge(world, world.objects.countries.geometries))
+    .attr("class", "land")
+    .attr("d", path);
 
   g.append("path")
-      .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
-      .attr("class", "boundary")
-      .attr("d", path);
+    .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b;}))
+    .attr("class", "boundary")
+    .attr("d", path);
 
 });
 
@@ -184,79 +185,90 @@ mvpTrophies.append("text").text("to view their awards")
 
 function zoomed() {
   projection
-      .translate(zoom.translate())
-      .scale(zoom.scale());
+    .translate(zoom.translate())
+    .scale(zoom.scale());
 
   g.selectAll("path")
-      .attr("d", path);
+    .attr("d", path);
 
-  svg.selectAll("image").attr("x", function(d) {return projection([d.Longitude, d.Latitude])[0]})
-  .attr("y", function(d) {return projection([d.Longitude, d.Latitude])[1]})
+  svg.selectAll("image").attr("x", function(d) {
+      return projection([d.Longitude, d.Latitude])[0]
+    })
+    .attr("y", function(d) {
+      return projection([d.Longitude, d.Latitude])[1]
+    })
 }
 
 d3.select(self.frameElement).style("height", height + "px");
 
 var mvp_data;
 
-d3.csv("data/mvp_list.csv", function (error, rows) {
-  
+d3.csv("data/mvp_list.csv", function(error, rows) {
+
   mvp_data = rows;
-  
-  function remove_duplicates(c) {
-    mvp_data = rows;
+
+  function remove_duplicates(c, optArray) {
+    var mvp_data = rows;
+    if (optArray) { mvp_data = optArray }
     mvp_data_copy = [];
     var set = new Set();
-    
-    if (c=="College") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].College)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].College);
-              }
-            }        
-    }
-    if (c=="Player") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].Player)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].Player);
-              }
-            }        
-    }
-    if (c=="Team") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].Team)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].Team);
-              }
-            }        
-    }
-    if (c=="Hometown") {
-            for(var k = 0; k < mvp_data.length; k++){
-              if(set.has(mvp_data[k].Hometown)){
-                continue;
-              }
-              else{
-                mvp_data_copy.push(mvp_data[k]);
-                set.add(mvp_data[k].Hometown);
-              }
-            }        
-    }
 
+    if (c == "College") {
+      for (var k = 0; k < mvp_data.length; k++) {
+        if (set.has(mvp_data[k].College)) {
+          continue;
+        } else {
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].College);
+        }
+      }
+    }
+    if (c == "Player") {
+      for (var k = 0; k < mvp_data.length; k++) {
+        if (set.has(mvp_data[k].Player)) {
+          continue;
+        } else {
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].Player);
+        }
+      }
+    }
+    if (c == "Team") {
+      for (var k = 0; k < mvp_data.length; k++) {
+        if (set.has(mvp_data[k].Team)) {
+          continue;
+        } else {
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].Team);
+        }
+      }
+    }
+    if (c == "Hometown") {
+      for (var k = 0; k < mvp_data.length; k++) {
+        if (set.has(mvp_data[k].Hometown)) {
+          continue;
+        } else {
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].Hometown);
+        }
+      }
+    }
+    if (c == "League") {
+      for (var k = 0; k < mvp_data.length; k++) {
+        if (set.has(mvp_data[k].League)) {
+          continue;
+        } else {
+          mvp_data_copy.push(mvp_data[k]);
+          set.add(mvp_data[k].League);
+        }
+      }
+    }
     return mvp_data_copy;
   }
 
-  var playerPointsNoDup = svg.selectAll(".playerPoints").data(remove_duplicates("Player"));
-  
+  var playerPointsNoDup =
+    svg.selectAll(".playerPoints").data(remove_duplicates("Player"), function(d) { return d.ID; });
+
   playerPointsNoDup
     .enter().append("image")
     .attr("x", function(d) {return projection([d.Longitude, d.Latitude])[0];})
@@ -276,61 +288,50 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
     .attr("height", 20)
     .style("opacity", "0.4")
     .attr("xlink:href", function (d) {
-          if (d.League == "MLB") {
-              return "resources/images/mlb.png";
-          }                  
-          if (d.League == "NHL") {
-              return "resources/images/nhl.png";
-          }
-          if (d.League == "NBA") {
-              return "resources/images/nba.png";
-          }
-          if (d.League == "NFL") {
-              return "resources/images/nfl.png";
-          }
+          if (d.League == "MLB") { return "resources/images/mlb.png"; }                  
+          if (d.League == "NHL") { return "resources/images/nhl.png"; }
+          if (d.League == "NBA") { return "resources/images/nba.png"; }
+          if (d.League == "NFL") { return "resources/images/nfl.png"; }
     });
 
-  playerPointsNoDup.on('mouseover',function(){
-        var curr = d3.select(this);
-        curr.style("opacity", "0.7");
-        var name = curr.attr("name");
-        var age = curr.attr("age");
-        var hometown = curr.attr("hometown");
-        var salary = curr.attr("salary");
-        var weight = curr.attr("weight");
-        var playerHeight = curr.attr("pheight");
-        var team = curr.attr("team");
-        var college = curr.attr("college");
-        var position = curr.attr("position");
+  playerPointsNoDup.on('mouseover', function() {
+    var curr = d3.select(this);
+    curr.style("opacity", "0.7");
+    var name = curr.attr("name");
+    var age = curr.attr("age");
+    var hometown = curr.attr("hometown");
+    var salary = curr.attr("salary");
+    var weight = curr.attr("weight");
+    var playerHeight = curr.attr("pheight");
+    var team = curr.attr("team");
+    var college = curr.attr("college");
+    var position = curr.attr("position");
 
-        name.split(' ').join('_')
-        tip.transition()    
-                .duration(200)    
-                .style("opacity", .9);    
-        tip.html("<img src='resources/images/player-photos/" + name.toLowerCase().split(' ').join('_') + ".jpg'" +
-                  "style='float: left;',  height=160, width=130> <h4>"
-                  + name + "</h4>" + "<br/>"  +
-                  "<strong><u>Hometown:</u></strong>  " + hometown + "<br/>" + 
-                  "<strong><u>Team:</u></strong>  " + team + "<br/>" + 
-                  "<strong><u>Position:</u></strong>  " + position + "<br/>" + 
-                  "<strong><u>Age:</u></strong>  " + age + "<br/>" + 
-                  "<strong><u>Height:</u></strong>  " + playerHeight + "<br/>" + 
-                  "<strong><u>Weight:</u></strong>  " + weight + " lbs<br/>" +
-                  "<strong><u>College:</u></strong>  " + college + "<br/>" + 
-                  "<strong><u>Salary:</u></strong>  $" + salary + "<br/>")
-            .style("left", (d3.event.pageX) + "px")   
-            .style("top", (d3.event.pageY - 28) + "px");  
-  })          
-            
-  playerPointsNoDup.on('mouseout',function(){
-        d3.select(this).style("opacity", "0.4");
-        svg.select("#playerLabel").remove();
-        tip.transition()    
-                .duration(500)    
-                .style("opacity", 0); 
-  })
+    name.split(' ').join('_')
+    tip.transition().duration(200).style("opacity", .9);
+    
+    tip.html("<img src='resources/images/player-photos/" + name.toLowerCase().split(' ').join('_') + ".jpg'" +
+        "style='float: left;',  height=160, width=130> <h4>" +
+        name + "</h4>" + "<br/>" +
+        "<strong><u>Hometown:</u></strong>  " + hometown + "<br/>" +
+        "<strong><u>Team:</u></strong>  " + team + "<br/>" +
+        "<strong><u>Position:</u></strong>  " + position + "<br/>" +
+        "<strong><u>Age:</u></strong>  " + age + "<br/>" +
+        "<strong><u>Height:</u></strong>  " + playerHeight + "<br/>" +
+        "<strong><u>Weight:</u></strong>  " + weight + " lbs<br/>" +
+        "<strong><u>College:</u></strong>  " + college + "<br/>" +
+        "<strong><u>Salary:</u></strong>  $" + salary + "<br/>")
+      .style("left", (d3.event.pageX) + "px")
+      .style("top", (d3.event.pageY - 28) + "px");
+  });
 
-  playerPointsNoDup.on('click',function(){
+  playerPointsNoDup.on('mouseout', function() {
+    d3.select(this).style("opacity", "0.4");
+    svg.select("#playerLabel").remove();
+    tip.transition().duration(500).style("opacity", 0);
+  });
+
+playerPointsNoDup.on('click',function(){
         if(!e) var e = window.event;
           e.cancelBubble = true;
           if(e.stopPropogation) e.stopPropogation();
@@ -543,11 +544,7 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
 
           Repeat all this for the other sports.
           *******************************************************/
-          
-          
-
-
-
+      
         });
         mvpWindow.append("text")
             .text("")
@@ -695,7 +692,461 @@ d3.csv("data/mvp_list.csv", function (error, rows) {
     .attr("dy", ".35em")
     .style("text-anchor", "end")
     .text(function(d) { return d; });
-    
+
+  var collegeDropDown = d3.select(".college-dropdown").append("select").attr("name", "college-list");
+  var teamDropDown = d3.select(".team-dropdown").append("select").attr("name", "team-list");
+  var leagueDropDown = d3.select(".sport-dropdown").append("select").attr("name", "sport-list");
+
+  var colleges = remove_duplicates("College");
+  var teams = remove_duplicates("Team");
+  var leagues = remove_duplicates("League");
+  var allobject = {
+    Age: "-- All --",
+    College: "-- All --",
+    Height: "-- All --",
+    Hometown: "-- All --",
+    Latitude: "-- All --",
+    League: "-- All --",
+    Longitude: "-- All --",
+    Player: "-- All --",
+    Position: "-- All --",
+    Salary: "-- All --",
+    Season: "-- All --",
+    Subleague: "-- All --",
+    Team: "-- All --",
+    Weight: "-- All --"
+  };
+  
+  colleges.unshift(allobject);
+  teams.unshift(allobject);
+  leagues.unshift(allobject);
+  
+  var collegeOptions = collegeDropDown.selectAll("option").data(colleges).enter().append("option");
+  var teamOptions = teamDropDown.selectAll("option").data(teams).enter().append("option");
+  var leagueOptions = leagueDropDown.selectAll("option").data(leagues).enter().append("option");
+
+  collegeOptions.text(function(d) { return d.College; })
+    .attr("value", function(d) { return d.College;})
+    .attr("id", function(d) { return d.College.split(' ').join('_');});
+  teamOptions.text(function(d) { return d.Team; })
+    .attr("value", function(d) { return d.Team; })
+    .attr("id", function(d) { return d.Team.split(' ').join('_'); });
+  leagueOptions.text(function(d) { return d.League; })
+    .attr("value", function(d) { return d.League; })
+    .attr("id", function(d) { return d.League.split(' ').join('_'); });
+
+  collegeDropDown.on("change", filterHandlerCollege);
+  teamDropDown.on("change", filterHandlerTeam);
+  leagueDropDown.on("change", filterHandlerLeague);
+
+  function filterHandlerCollege() { filterDots("College"); }
+  function filterHandlerTeam() { filterDots("Team"); }
+  function filterHandlerLeague() { filterDots("League"); }
+
+  function filterDots(typeChanged, resetFlag) {
+    var college = collegeDropDown.node().value;
+    var team = teamDropDown.node().value;
+    var league = leagueDropDown.node().value;
+    if (resetFlag) {
+        college = "-- All --";
+        team = "-- All --";
+        league = "-- All --";
+    }
+
+    var newData = mvp_data.filter(function(d) {
+      return (d.College == college || college == "-- All --") &&
+        (d.Team == team || team == "-- All --") &&
+        (d.League == league || league == "-- All --");
+    });
+    dots = scatterplot.selectAll(".dot").data(newData, function(d) { return d.ID; });
+    dots.enter();
+    dots.attr("display", "inline");
+    dots.exit().attr("display", "none");
+
+    var newColleges = remove_duplicates("College", newData);
+    var newTeams = remove_duplicates("Team", newData);
+    var newLeagues = remove_duplicates("League", newData);
+
+    newColleges.unshift(allobject);
+    newTeams.unshift(allobject);
+    newLeagues.unshift(allobject);
+
+    collegeOptions = collegeDropDown.selectAll("option").data(newColleges);
+    collegeOptions.enter().append("option");
+    teamOptions = teamDropDown.selectAll("option").data(newTeams);
+    teamOptions.enter().append("option");
+    leagueOptions = leagueDropDown.selectAll("option").data(newLeagues);
+    leagueOptions.enter().append("option");
+
+    collegeOptions.text(function(d) { return d.College; })
+      .attr("value", function(d) { return d.College; })
+      .attr("id", function(d) { return d.College.split(' ').join('_'); })
+      .attr("class", function(d) { return d.College.split(' ').join('_'); });
+    teamOptions.text(function(d) { return d.Team; })
+      .attr("value", function(d) { return d.Team; })
+      .attr("id", function(d) { return d.Team.split(' ').join('_'); })
+      .attr("class", function(d) { return d.Team.split(' ').join('_'); });
+    leagueOptions.text(function(d) { return d.League; })
+      .attr("value", function(d) { return d.League; })
+      .attr("id", function(d) { return d.League.split(' ').join('_'); })
+      .attr("class", function(d) { return d.League.split(' ').join('_');});
+
+    collegeOptions.exit().remove();
+    teamOptions.exit().remove();
+    leagueOptions.exit().remove();
+
+    switch (typeChanged) {
+      case "College":
+        d3.select('#' + college.split(' ').join('_')).property("selected", "selected");
+        break;
+      case "Team":
+        d3.select('#' + team.split(' ').join('_')).property("selected", "selected");
+        break;
+      case "League":
+        d3.select('#' + league.split(' ').join('_')).property("selected", "selected");
+        break;
+      default:
+        console.log(typeChanged);
+    }
+  }
+
+  resetbutton = d3.select("#reset-button")
+  resetbutton.on("click", function() {
+    console.log("clicked");
+    //selection = d3.selectAll(".--_All_--")
+    //selection.property("selected", "selected")
+    filterDots(null, 1);
+  });
+
+});
+</script>
+
+
+<script>
+
+var width = 750, height = 500;
+
+var mvp_data;
+var probe;
+
+d3.csv("data/mvp_list.csv", function (error, rows) {
+  
+  mvp_data = rows;
+
+  var color = d3.scale.category10();
+  //ensures consistent order of coloring
+  var leagues = ["NBA", "NFL", "NHL", "MLB"];
+
+  var margin = {top: 40, right: 50, bottom: 50, left: 50},
+      width = 1260 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom,
+      barSpacing = .5;
+
+  var categoryToUnits = {Age: "(yr)", Height: "(in)", Weight: "(lb)", Salary: "($100,000)", }
+
+  var MLBRows = mvp_data.filter(function (row) {return row["League"] == 'MLB';}),
+    NFLRows = mvp_data.filter(function (row) {return row["League"] == 'NFL';}),
+    NBARows = mvp_data.filter(function (row) {return row["League"] == 'NBA';}),
+    NHLRows = mvp_data.filter(function (row) {return row["League"] == 'NHL';});
+
+  var histogram = d3.select("#overall-stats").append("svg")
+      .attr("id","histogram")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var yScale, xScale, labelScale, rect, layer, yAxis, xAxis, layers, yGroupMax, yStackMax, numBins, category;
+
+  var currentMode = "stacked";
+  var category = "Age";
+  initCategory();
+
+  d3.selectAll(".histogramButton").on("click",function() {
+    switch (this.value) {
+      case "grouped": 
+        currentMode = this.value;
+        transitionGrouped(); 
+        break;
+      case "stacked": 
+        currentMode = this.value;
+        transitionStacked(); 
+        break;
+      default:
+        category = this.value;
+        transitionCategory();
+    }
+  });
+
+  function transitionGrouped() {
+    yScale.domain([0, yGroupMax]);
+    d3.selectAll(".yAxis").remove();
+    histogram.append("g")
+      .attr("class", "yAxis")
+      .attr("transform", "translate(" + margin.left + ",0)")
+      .call(yAxis)
+      .append("text")
+        .attr("class", "label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Frequency");
+
+    rect = layer.selectAll("rect");
+    rect.transition()
+        .duration(500)
+        .delay(function(d, i) { return i * 10; })
+        .attr("x", function(d, i, j) { return xScale(d.x) + xScale.rangeBand() / 4 * j; })
+        .attr("width", xScale.rangeBand() / 4)
+      .transition()
+        .attr("y", function(d) { return yScale(d.y); })
+        .attr("height", function(d) { return height - yScale(d.y); });
+  }
+
+  function transitionStacked() {
+    yScale.domain([0, yStackMax]);
+    d3.selectAll(".yAxis").remove();
+    histogram.append("g")
+      .attr("class", "yAxis")
+      .attr("transform", "translate(" + margin.left + ",0)")
+      .call(yAxis)
+        .append("text")
+        .attr("class", "label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Frequency");;
+
+    rect = layer.selectAll("rect");
+    rect.transition()
+        .duration(500)
+        .delay(function(d, i) { return i * 10; })
+        .attr("y", function(d) { return yScale(d.y0 + d.y); })
+        .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y); })
+      .transition()
+        .attr("x", function(d) { return xScale(d.x); })
+        .attr("width", xScale.rangeBand());
+  }
+
+  function getData() {
+    var categoryToBins= {Age: 10, Height: 10, Weight: 10, Salary: 10};
+    var dataMod = (category==="Salary")?1/100000:1;
+    var endSubtractor = {Age: 1, Height: .1, Weight: 1, Salary: 100000};
+    numBins = categoryToBins[category];
+
+    var maxMin = d3.extent(mvp_data, function (row) {return Number(row[category]);}),
+      range = maxMin[1]-maxMin[0];
+
+    var MLBBins=[], NFLBins=[], NBABins=[], NHLBins=[];
+    for (var i = numBins; i >= 0; i--) {
+      var begin = i*(range/numBins)+maxMin[0],
+        end = (i+1)*(range/numBins)+maxMin[0]-endSubtractor[category];
+      var begin = Math.floor(10*begin*dataMod)/10,
+        end = Math.floor(10*end*dataMod)/10;
+      var label = String(begin) + "-" + String(end);
+      //Initialize all bins with this format
+      MLBBins[i]={x: end, label: label, y: 0, id: i};
+        NFLBins[i]={x: end, label: label, y: 0, id: numBins + i};
+        NBABins[i]={x: end, label: label, y: 0, id: numBins*2 + i};
+        NHLBins[i]={x: end, label: label, y: 0, id: numBins*3 + i};
+    }
+
+    MLBRows.forEach(function (row) {
+      var ind = Math.floor((row[category]-maxMin[0])/(range/numBins));
+      MLBBins[ind].y++;});
+    NFLRows.forEach(function (row) {
+      var ind = Math.floor((row[category]-maxMin[0])/(range/numBins));
+      NFLBins[ind].y++;});
+    NBARows.forEach(function (row) {
+      var ind = Math.floor((row[category]-maxMin[0])/(range/numBins));
+      NBABins[ind].y++;});
+    NHLRows.forEach(function (row) {
+      var ind = Math.floor((row[category]-maxMin[0])/(range/numBins));
+      NHLBins[ind].y++;});
+
+    var allBins = [NBABins, NFLBins, NHLBins, MLBBins];
+
+    //Adapted from mbostock, at http://bl.ocks.org/mbostock/3943967
+    var stack = d3.layout.stack();
+    layers = stack(d3.range(4).map(function(d, i) { return allBins[i]; })),
+    // layers.forEach(function(layer,i) {layer.id = leagues[i];})
+    yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); }),
+    yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
+
+    xScale = d3.scale.ordinal()
+        .domain(MLBBins.map(function(d){return d.x;}))
+        .rangeRoundBands([margin.left, width], barSpacing);
+
+    yScale = d3.scale.linear()
+        .domain([0, yStackMax])
+        .range([height, 0]);
+
+    labelScale = d3.scale.ordinal()
+        .domain(MLBBins.map(function(d){return d.label;}))
+        .rangeRoundBands([margin.left, width], barSpacing);
+
+    xAxis = d3.svg.axis()
+        .scale(labelScale)
+        .tickSize(0)
+        .tickPadding(6)
+        .orient("bottom");
+    yAxis = d3.svg.axis()
+      .scale(yScale)
+      .tickSize(1)
+      .tickPadding(6)
+      .orient("left");
+  }
+
+  function initCategory() {
+    getData();
+
+    layer = histogram.selectAll(".layer")
+        .data(layers)
+      .enter().append("g")
+        .attr("class", "layer")
+        .style("fill", function(d, i) { return color(leagues[i]); });
+
+    rect = layer.selectAll("rect")
+        .data(function(d) { return d; })
+      .enter().append("rect")
+        .attr("x", function(d) { return xScale(d.x); })
+        .attr("y", height)
+        .attr("width", xScale.rangeBand())
+        .attr("height", 0);
+
+    rect.transition().duration(1500)
+        .attr("y", function(d) { return yScale(d.y0 + d.y); })
+        .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y); });
+
+    histogram.append("g").attr("class", "xAxis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .append("text")
+          .attr("class", "label")
+          .attr("x", width/2)
+          .attr("y", 28)
+          .attr("dy", ".71em")
+          .style("text-anchor", "center")
+          .style("font-size", "12pt")
+          .text(category + " " + categoryToUnits[category]);
+    histogram.append("g").attr("class", "yAxis")
+        .attr("transform", "translate(" + margin.left + ",0)")
+        .call(yAxis)
+        .append("text")
+          .attr("class", "label")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("Frequency");
+          
+    var legend = d3.select("#histogram").selectAll(".legend")
+      .data(color.domain())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+    legend.append("rect")
+        .attr("x", width - 18)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", color);
+
+    legend.append("text")
+        .attr("x", width - 24)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text(function(d) { return d; });
+  }
+
+  function transitionCategory() {
+    getData();
+
+    layer = histogram.selectAll(".layer")
+        .data(layers)
+        .style("fill", function(d, i) { return color(leagues[i]); });
+    layer.exit().remove();
+
+    rect = layer.selectAll("rect")
+        .data(function(d) { return d; })
+        .transition().duration(500)
+        .attr("x", function(d) { return xScale(d.x); })
+        .attr("y", height-20)
+        .attr("width", xScale.rangeBand()/4)
+        .attr("height",20);
+
+    if (currentMode==="grouped") {
+      yScale.domain([0, yGroupMax]);
+      d3.selectAll(".yAxis").remove();
+      histogram.append("g")
+        .attr("class", "yAxis")
+        .attr("transform", "translate(" + margin.left + ",0)")
+        .call(yAxis)
+        .append("text")
+          .attr("class", "label")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("Frequency");;
+      rect.transition()
+        .duration(500)
+        .attr("x", function(d, i, j) { return xScale(d.x) + xScale.rangeBand() / 4 * j; })
+        .attr("width", xScale.rangeBand() / 4)
+        .attr("y", function(d) { return yScale(d.y); })
+        .attr("height", function(d) { return height - yScale(d.y); });
+    } else {
+      yScale.domain([0, yStackMax]);
+      d3.selectAll(".yAxis").remove();
+      histogram.append("g")
+        .attr("class", "yAxis")
+        .attr("transform", "translate(" + margin.left + ",0)")
+        .call(yAxis)
+        .append("text")
+          .attr("class", "label")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("Frequency");;
+
+      rect.transition().duration(500)
+        .attr("x", function(d) { return xScale(d.x); })
+        .attr("width", xScale.rangeBand())
+        .attr("y", function(d) { return yScale(d.y0 + d.y); })
+        .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y); });
+    }
+
+    //Reset Axes
+    d3.selectAll(".xAxis").remove();
+    d3.selectAll(".yAxis").remove();
+    histogram.append("g").attr("class", "xAxis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .append("text")
+          .attr("class", "label")
+          .attr("x", width/2)
+          .attr("y", 28)
+          .attr("dy", ".71em")
+          .style("text-anchor", "center")
+          .style("font-size", "12pt")
+          .text(category + " " + categoryToUnits[category]);
+    histogram.append("g").attr("class", "yAxis")
+        .attr("transform", "translate(" + margin.left + ",0)")
+        .call(yAxis)
+        .append("text")
+          .attr("class", "label")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("Frequency");
+  }
+  
+});
 
 function mvp_avg_graph(givenSVG, name, data){
   var margin = {top: 40, right: 20, bottom: 30, left: 40},
@@ -1202,22 +1653,7 @@ function addTrophyGraphic(givenSVG, name, league){
           .attr("class", "tooltip")
           .text(function(d){ return d;});
 
-  // var trophyTip = givenSVG.selectAll("image")
-  //                         .append("svg:title")
-  //                         .text(function(d) {return d3.select(this).attr("year"); });
 }
-// function displaySpecificTrophy(givenSVG, playerIndex, playerLeague, trophyType){
-//   var imageFile = playerLeague.toLowerCase() + "_" + trophyType.toLowerCase();
-//   for(var i = 0; i < trophies[playerIndex][trophyType].length; i++){
-//       givenSVG.append("image")
-//           .attr("x", 80*i)
-//           .attr("y", 30)
-//           .attr("width", 200)
-//           .attr("height", 70)
-//           // .style("opacity", "0.4")
-//           .attr("xlink:href", "resources/images/trophy-photos/" + imageFile + ".png");
-//   }
-// }
 
 var trophies = [
               {Player: "Kobe Bryant",
@@ -1290,9 +1726,179 @@ var trophies = [
               Championship: [],
               Golden_Glove: [1990,1991,1992,1993,1994,1996,1997,1998],
               Silver_Slugger: [1990,1991,1992,1993,1994,1996,1997,2000,2001,2002,2003,2004]},
+              
+              {Player: "Cam Newtown",
+              MVP: [2015],
+              Championship: [],
+              All_Star: [2015],
+              Offensive: [2015]},
+              {Player: "Aaron Rodgers",
+              MVP: [2011, 2014],
+              Championship: [2010],
+              All_Star: [2011,2012,2014],
+              Offensive: [2011]},
+              {Player: "Tom Brady",
+              MVP: [2011, 2014],
+              Championship: [2002, 2004, 2005, 2006],
+              All_Star: [2011,2012,2014],
+              Offensive: [2011]},
+              {Player: "Peyton Manning",
+              MVP: [2011, 2014],
+              Championship: [2002, 2004, 2005, 2006],
+              All_Star: [2011,2012,2014],
+              Offensive: [2011]},
+              {Player: "Adrian Peterson",
+              MVP: [2011, 2014],
+              Championship: [2002, 2004, 2005, 2006],
+              All_Star: [2011,2012,2014],
+              Offensive: [2011]},
+              {Player: "LaDainian Tomlinson",
+              MVP: [2011, 2014],
+              Championship: [2000,2001],
+              All_Star: [2011,2014],
+              Offensive: [2011]},
+              {Player: "Shaun Alexander",
+              MVP: [2011, 2014],
+              Championship: [2000,2001],
+              All_Star: [2011,2014],
+              Offensive: [2011]},
+              {Player: "Shaun Alexander",
+              MVP: [2011, 2014],
+              Championship: [],
+              All_Star: [2011],
+              Offensive: [2011]},
+              {Player: "Rich Gannon",
+              MVP: [2011, 2014],
+              Championship: [],
+              All_Star: [2011],
+              Offensive: [2011]},
+              {Player: "Kurt Warner",
+              MVP: [2011, 2014, 2015],
+              Championship: [2010],
+              All_Star: [2011],
+              Offensive: [2011]},
+              {Player: "Marshall Faulk",
+              MVP: [2011, 2014, 2015],
+              Championship: [2010],
+              All_Star: [2011],
+              Offensive: [2011]},
+              
+              {Player: "Alex Ovechkin",
+              MVP: [2008,2009,2013],
+              Championship: [],
+              All_Star: [2006,2007,2008,2009,2010,2011,2013,2014,2015],
+              Conn_Smythe: []},
 
-
-
+              {Player: "Evgeni Malkin",
+              MVP: [2012],
+              Championship: [2009],
+              All_Star: [2008,2009,2012],
+              Conn_Smythe: [2009]},
+              {Player: "Josh Donaldson",
+              MVP: [2015],
+              Championship: [],
+              Golden_Glove: [],
+              Silver_Slugger: [2015]},
+              {Player: "Mike Trout",
+              MVP: [2014],
+              Championship: [],
+              Golden_Glove: [],
+              Silver_Slugger: [2012,2013,2014,2015]},
+              {Player: "Justin Verlander",
+              MVP: [2011],
+              Championship: [],
+              Golden_Glove: [],
+              Silver_Slugger: []},
+              {Player: "Josh Hamilton",
+              MVP: [2010],
+              Championship: [],
+              Golden_Glove: [],
+              Silver_Slugger: [2008,2010,2012]},
+              {Player: "Joe Mauer",
+              MVP: [2009],
+              Championship: [],
+              Golden_Glove: [2008,2009,2010],
+              Silver_Slugger: [2006,2008,2009,2010,2013]},
+              {Player: "Dustin Pedroia",
+              MVP: [2008],
+              Championship: [2007,2013],
+              Golden_Glove: [2008,2011,2013,2014],
+              Silver_Slugger: [2008]},
+              {Player: "Justin Morneau",
+              MVP: [2006],
+              Championship: [],
+              Golden_Glove: [],
+              Silver_Slugger: [2006,2008]},
+              {Player: "Vladimir Guerrero",
+              MVP: [2004],
+              Championship: [],
+              Golden_Glove: [],
+              Silver_Slugger: [1999,2000,2002,2004,2005,2006,2007,2010]},
+              {Player: "Miguel Tejada",
+              MVP: [2002],
+              Championship: [],
+              Golden_Glove: [],
+              Silver_Slugger: [2004, 2005]},
+              {Player: "Ichiro Suzuki",
+              MVP: [2001],
+              Championship: [],
+              Golden_Glove: [2001,2002,2003,2004,2005,2006,2007,2008,2009,2010],
+              Silver_Slugger: [2001,2007,2009]},
+              {Player: "Jason Giambi",
+              MVP: [2000],
+              Championship: [],
+              Golden_Glove: [],
+              Silver_Slugger: [2001,2002]},
+              {Player: "Bryce Harper",
+              MVP: [2015],
+              Championship: [],
+              Golden_Glove: [],
+              Silver_Slugger: [2015]},
+              {Player: "Clayton Kershaw",
+              MVP: [2014],
+              Championship: [],
+              Golden_Glove: [2011],
+              Silver_Slugger: []},
+              {Player: "Andrew McCutchen",
+              MVP: [2013],
+              Championship: [],
+              Golden_Glove: [2012],
+              Silver_Slugger: [2012,2013,2014,2015]},
+              {Player: "Buster Posey",
+              MVP: [2012],
+              Championship: [2010,2012,2014],
+              Golden_Glove: [],
+              Silver_Slugger: [2012,2014,2015]},
+              {Player: "Ryan Braun",
+              MVP: [2011],
+              Championship: [],
+              Golden_Glove: [],
+              Silver_Slugger: [2008,2009,2010,2011,2012]},
+              {Player: "Joey Votto",
+              MVP: [2010],
+              Championship: [],
+              Golden_Glove: [2011],
+              Silver_Slugger: []},
+              {Player: "Albert Pujols",
+              MVP: [2005,2008,2009],
+              Championship: [2006,2011],
+              Golden_Glove: [],
+              Silver_Slugger: [2001,2003,2004,2008,2009,2010]},
+              {Player: "Jimmy Rollins",
+              MVP: [2007],
+              Championship: [2008],
+              Golden_Glove: [2007,2008,2009,2012],
+              Silver_Slugger: [2007]},
+              {Player: "Ryan Howard",
+              MVP: [2006],
+              Championship: [2008],
+              Golden_Glove: [],
+              Silver_Slugger: [2006]},
+              {Player: "Jeff Kent",
+              MVP: [2000],
+              Championship: [],
+              Golden_Glove: [],
+              Silver_Slugger: [2000,2001,2002,2005]},
 
               {Player: "Alex Ovechkin",
               MVP: [2008,2009,2013],
@@ -1305,460 +1911,68 @@ var trophies = [
               Championship: [2009],
               All_Star: [2008,2009,2012],
               Conn_Smythe: [2009]},
-              ];
 
+              {Player: "Carey Price",
+              MVP: [2015],
+              Championship: [],
+              All_Star: [2015],
+              Conn_Smythe: []},
+
+              {Player: "Sidney Crosby",
+              MVP: [2007,2014],
+              Championship: [2009],
+              All_Star: [2007,2010,2013,2014,2015],
+              Conn_Smythe: []},
+
+              {Player: "Corey Perry",
+              MVP: [2011],
+              Championship: [2007],
+              All_Star: [2010,2013],
+              Conn_Smythe: []},
+
+              {Player: "Henrik Sedin",
+              MVP: [2010],
+              Championship: [],
+              All_Star: [2010,2011],
+              Conn_Smythe: []},
+
+              {Player: "Joe Thornton",
+              MVP: [2006],
+              Championship: [],
+              All_Star: [2003, 2006, 2008],
+              Conn_Smythe: []},
+
+              {Player: "Martin St.Louis",
+              MVP: [2004],
+              Championship: [2004],
+              All_Star: [2003, 2006, 2009, 2010, 2012],
+              Conn_Smythe: []},
+
+              {Player: "Peter Forsberg",
+              MVP: [2003],
+              Championship: [1996, 2001],
+              All_Star: [1998,1999,2003],
+              Conn_Smythe: []},
+
+              {Player: "Jose Theodore",
+              MVP: [2002],
+              Championship: [],
+              All_Star: [2002],
+              Conn_Smythe: []},
+
+              {Player: "Joe Sakic",
+              MVP: [2001],
+              Championship: [1996,2001],
+              All_Star: [2001,2002,2004],
+              Conn_Smythe: [1996]},
+
+              {Player: "Chris Pronger",
+              MVP: [2000],
+              Championship: [2007],
+              All_Star: [1998, 2000, 2004, 2007],
+              Conn_Smythe: []}
               
-
-  var collegeDropDown = d3.select(".college-dropdown").append("select").attr("name", "college-list");
-  var teamDropDown = d3.select(".team-dropdown").append("select").attr("name", "team-list");
-  var leagueDropDown = d3.select(".sport-dropdown").append("select").attr("name", "sport-list");
-
-  var colleges = remove_duplicates("College");
-  var teams = remove_duplicates("Team");
-  var leagues = remove_duplicates("League");
-  var allobject = {
-    Age: "-- All --",
-    College: "-- All --",
-    Height: "-- All --",
-    Hometown: "-- All --",
-    Latitude: "-- All --",
-    League: "-- All --",
-    Longitude: "-- All --",
-    Player: "-- All --",
-    Position: "-- All --",
-    Salary: "-- All --",
-    Season: "-- All --",
-    Subleague: "-- All --",
-    Team: "-- All --",
-    Weight: "-- All --"
-  };
-  
-  colleges.unshift(allobject);
-  teams.unshift(allobject);
-  leagues.unshift(allobject);
-  
-  var collegeOptions = collegeDropDown.selectAll("option").data(colleges).enter().append("option");
-  var teamOptions = teamDropDown.selectAll("option").data(teams).enter().append("option");
-  var leagueOptions = leagueDropDown.selectAll("option").data(leagues).enter().append("option");
-
-  collegeOptions.text(function(d) { return d.College; })
-    .attr("value", function(d) { return d.College;})
-    .attr("id", function(d) { return d.College.split(' ').join('_');});
-  teamOptions.text(function(d) { return d.Team; })
-    .attr("value", function(d) { return d.Team; })
-    .attr("id", function(d) { return d.Team.split(' ').join('_'); });
-  leagueOptions.text(function(d) { return d.League; })
-    .attr("value", function(d) { return d.League; })
-    .attr("id", function(d) { return d.League.split(' ').join('_'); });
-
-  collegeDropDown.on("change", filterHandlerCollege);
-  teamDropDown.on("change", filterHandlerTeam);
-  leagueDropDown.on("change", filterHandlerLeague);
-
-  function filterHandlerCollege() { filterDots("College"); }
-  function filterHandlerTeam() { filterDots("Team"); }
-  function filterHandlerLeague() { filterDots("League"); }
-
-  function filterDots(typeChanged, resetFlag) {
-    var college = collegeDropDown.node().value;
-    var team = teamDropDown.node().value;
-    var league = leagueDropDown.node().value;
-    if (resetFlag) {
-        college = "-- All --";
-        team = "-- All --";
-        league = "-- All --";
-    }
-
-    var newData = mvp_data.filter(function(d) {
-      return (d.College == college || college == "-- All --") &&
-        (d.Team == team || team == "-- All --") &&
-        (d.League == league || league == "-- All --");
-    });
-    dots = scatterplot.selectAll(".dot").data(newData, function(d) { return d.ID; });
-    dots.enter();
-    dots.attr("display", "inline");
-    dots.exit().attr("display", "none");
-
-    var newColleges = remove_duplicates("College", newData);
-    var newTeams = remove_duplicates("Team", newData);
-    var newLeagues = remove_duplicates("League", newData);
-
-    newColleges.unshift(allobject);
-    newTeams.unshift(allobject);
-    newLeagues.unshift(allobject);
-
-    collegeOptions = collegeDropDown.selectAll("option").data(newColleges);
-    collegeOptions.enter().append("option");
-    teamOptions = teamDropDown.selectAll("option").data(newTeams);
-    teamOptions.enter().append("option");
-    leagueOptions = leagueDropDown.selectAll("option").data(newLeagues);
-    leagueOptions.enter().append("option");
-
-    collegeOptions.text(function(d) { return d.College; })
-      .attr("value", function(d) { return d.College; })
-      .attr("id", function(d) { return d.College.split(' ').join('_'); })
-      .attr("class", function(d) { return d.College.split(' ').join('_'); });
-    teamOptions.text(function(d) { return d.Team; })
-      .attr("value", function(d) { return d.Team; })
-      .attr("id", function(d) { return d.Team.split(' ').join('_'); })
-      .attr("class", function(d) { return d.Team.split(' ').join('_'); });
-    leagueOptions.text(function(d) { return d.League; })
-      .attr("value", function(d) { return d.League; })
-      .attr("id", function(d) { return d.League.split(' ').join('_'); })
-      .attr("class", function(d) { return d.League.split(' ').join('_');});
-
-    collegeOptions.exit().remove();
-    teamOptions.exit().remove();
-    leagueOptions.exit().remove();
-
-    switch (typeChanged) {
-      case "College":
-        d3.select('#' + college.split(' ').join('_')).property("selected", "selected");
-        break;
-      case "Team":
-        d3.select('#' + team.split(' ').join('_')).property("selected", "selected");
-        break;
-      case "League":
-        d3.select('#' + league.split(' ').join('_')).property("selected", "selected");
-        break;
-      default:
-    }
-  }
-
-  resetbutton = d3.select("#reset-button")
-  resetbutton.on("click", function() {
-    filterDots(null, 1);
-  });
-
-});
-</script>
-
-
-<script>
-
-var width = 750, height = 500;
-
-var mvp_data;
-var probe;
-
-d3.csv("data/mvp_list.csv", function (error, rows) {
-  
-  mvp_data = rows;
-
-  var color = d3.scale.category10();
-  //ensures consistent order of coloring
-  var leagues = ["NBA", "NFL", "NHL", "MLB"];
-
-  var margin = {top: 40, right: 50, bottom: 50, left: 50},
-      width = 1260 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom,
-      barSpacing = .5;
-
-  var categoryToUnits = {Age: "(yr)", Height: "(in)", Weight: "(lb)", Salary: "($100,000)", }
-
-  var MLBRows = mvp_data.filter(function (row) {return row["League"] == 'MLB';}),
-    NFLRows = mvp_data.filter(function (row) {return row["League"] == 'NFL';}),
-    NBARows = mvp_data.filter(function (row) {return row["League"] == 'NBA';}),
-    NHLRows = mvp_data.filter(function (row) {return row["League"] == 'NHL';});
-
-  var histogram = d3.select("#overall-stats").append("svg")
-      .attr("id","histogram")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  var yScale, xScale, labelScale, rect, layer, yAxis, xAxis, layers, yGroupMax, yStackMax, numBins, category;
-
-  var currentMode = "stacked";
-  var category = "Age";
-  initCategory();
-
-  d3.selectAll(".histogramButton").on("click",function() {
-    switch (this.value) {
-      case "grouped": 
-        currentMode = this.value;
-        transitionGrouped(); 
-        break;
-      case "stacked": 
-        currentMode = this.value;
-        transitionStacked(); 
-        break;
-      default:
-        category = this.value;
-        transitionCategory();
-    }
-  });
-
-  function transitionGrouped() {
-    yScale.domain([0, yGroupMax]);
-    d3.selectAll(".yAxis").remove();
-    histogram.append("g")
-      .attr("class", "yAxis")
-      .attr("transform", "translate(" + margin.left + ",0)")
-      .call(yAxis)
-      .append("text")
-        .attr("class", "label")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Frequency");
-
-    rect = layer.selectAll("rect");
-    rect.transition()
-        .duration(500)
-        .delay(function(d, i) { return i * 10; })
-        .attr("x", function(d, i, j) { return xScale(d.x) + xScale.rangeBand() / 4 * j; })
-        .attr("width", xScale.rangeBand() / 4)
-      .transition()
-        .attr("y", function(d) { return yScale(d.y); })
-        .attr("height", function(d) { return height - yScale(d.y); });
-  }
-
-  function transitionStacked() {
-    yScale.domain([0, yStackMax]);
-    d3.selectAll(".yAxis").remove();
-    histogram.append("g")
-      .attr("class", "yAxis")
-      .attr("transform", "translate(" + margin.left + ",0)")
-      .call(yAxis)
-        .append("text")
-        .attr("class", "label")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Frequency");;
-
-    rect = layer.selectAll("rect");
-    rect.transition()
-        .duration(500)
-        .delay(function(d, i) { return i * 10; })
-        .attr("y", function(d) { return yScale(d.y0 + d.y); })
-        .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y); })
-      .transition()
-        .attr("x", function(d) { return xScale(d.x); })
-        .attr("width", xScale.rangeBand());
-  }
-
-  function getData() {
-    var categoryToBins= {Age: 10, Height: 10, Weight: 10, Salary: 10};
-    var dataMod = (category==="Salary")?1/100000:1;
-    var endSubtractor = {Age: 1, Height: .1, Weight: 1, Salary: 100000};
-    numBins = categoryToBins[category];
-
-    var maxMin = d3.extent(mvp_data, function (row) {return Number(row[category]);}),
-      range = maxMin[1]-maxMin[0];
-
-    var MLBBins=[], NFLBins=[], NBABins=[], NHLBins=[];
-    for (var i = numBins; i >= 0; i--) {
-      var begin = i*(range/numBins)+maxMin[0],
-        end = (i+1)*(range/numBins)+maxMin[0]-endSubtractor[category];
-      var begin = Math.floor(10*begin*dataMod)/10,
-        end = Math.floor(10*end*dataMod)/10;
-      var label = String(begin) + "-" + String(end);
-      //Initialize all bins with this format
-      MLBBins[i]={x: end, label: label, y: 0, id: i};
-        NFLBins[i]={x: end, label: label, y: 0, id: numBins + i};
-        NBABins[i]={x: end, label: label, y: 0, id: numBins*2 + i};
-        NHLBins[i]={x: end, label: label, y: 0, id: numBins*3 + i};
-    }
-
-    MLBRows.forEach(function (row) {
-      var ind = Math.floor((row[category]-maxMin[0])/(range/numBins));
-      MLBBins[ind].y++;});
-    NFLRows.forEach(function (row) {
-      var ind = Math.floor((row[category]-maxMin[0])/(range/numBins));
-      NFLBins[ind].y++;});
-    NBARows.forEach(function (row) {
-      var ind = Math.floor((row[category]-maxMin[0])/(range/numBins));
-      NBABins[ind].y++;});
-    NHLRows.forEach(function (row) {
-      var ind = Math.floor((row[category]-maxMin[0])/(range/numBins));
-      NHLBins[ind].y++;});
-
-    var allBins = [NBABins, NFLBins, NHLBins, MLBBins];
-
-    //Adapted from mbostock, at http://bl.ocks.org/mbostock/3943967
-    var stack = d3.layout.stack();
-    layers = stack(d3.range(4).map(function(d, i) { return allBins[i]; })),
-    // layers.forEach(function(layer,i) {layer.id = leagues[i];})
-    yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); }),
-    yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
-
-    xScale = d3.scale.ordinal()
-        .domain(MLBBins.map(function(d){return d.x;}))
-        .rangeRoundBands([margin.left, width], barSpacing);
-
-    yScale = d3.scale.linear()
-        .domain([0, yStackMax])
-        .range([height, 0]);
-
-    labelScale = d3.scale.ordinal()
-        .domain(MLBBins.map(function(d){return d.label;}))
-        .rangeRoundBands([margin.left, width], barSpacing);
-
-    xAxis = d3.svg.axis()
-        .scale(labelScale)
-        .tickSize(0)
-        .tickPadding(6)
-        .orient("bottom");
-    yAxis = d3.svg.axis()
-      .scale(yScale)
-      .tickSize(1)
-      .tickPadding(6)
-      .orient("left");
-  }
-
-  function initCategory() {
-    getData();
-
-    layer = histogram.selectAll(".layer")
-        .data(layers)
-      .enter().append("g")
-        .attr("class", "layer")
-        .style("fill", function(d, i) { return color(leagues[i]); });
-
-    rect = layer.selectAll("rect")
-        .data(function(d) { return d; })
-      .enter().append("rect")
-        .attr("x", function(d) { return xScale(d.x); })
-        .attr("y", height)
-        .attr("width", xScale.rangeBand())
-        .attr("height", 0);
-
-    rect.transition().duration(1500)
-        .attr("y", function(d) { return yScale(d.y0 + d.y); })
-        .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y); });
-
-    histogram.append("g").attr("class", "xAxis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-        .append("text")
-          .attr("class", "label")
-          .attr("x", width/2)
-          .attr("y", 28)
-          .attr("dy", ".71em")
-          .style("text-anchor", "center")
-          .style("font-size", "12pt")
-          .text(category + " " + categoryToUnits[category]);
-    histogram.append("g").attr("class", "yAxis")
-        .attr("transform", "translate(" + margin.left + ",0)")
-        .call(yAxis)
-        .append("text")
-          .attr("class", "label")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .text("Frequency");
-          
-    var legend = d3.select("#histogram").selectAll(".legend")
-      .data(color.domain())
-    .enter().append("g")
-      .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-    legend.append("rect")
-        .attr("x", width - 18)
-        .attr("width", 18)
-        .attr("height", 18)
-        .style("fill", color);
-
-    legend.append("text")
-        .attr("x", width - 24)
-        .attr("y", 9)
-        .attr("dy", ".35em")
-        .style("text-anchor", "end")
-        .text(function(d) { return d; });
-  }
-
-  function transitionCategory() {
-    getData();
-
-    layer = histogram.selectAll(".layer")
-        .data(layers)
-        .style("fill", function(d, i) { return color(leagues[i]); });
-    layer.exit().remove();
-
-    rect = layer.selectAll("rect")
-        .data(function(d) { return d; })
-        .transition().duration(500)
-        .attr("x", function(d) { return xScale(d.x); })
-        .attr("y", height-20)
-        .attr("width", xScale.rangeBand()/4)
-        .attr("height",20);
-
-    if (currentMode==="grouped") {
-      yScale.domain([0, yGroupMax]);
-      d3.selectAll(".yAxis").remove();
-      histogram.append("g")
-        .attr("class", "yAxis")
-        .attr("transform", "translate(" + margin.left + ",0)")
-        .call(yAxis)
-        .append("text")
-          .attr("class", "label")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .text("Frequency");;
-      rect.transition()
-        .duration(500)
-        .attr("x", function(d, i, j) { return xScale(d.x) + xScale.rangeBand() / 4 * j; })
-        .attr("width", xScale.rangeBand() / 4)
-        .attr("y", function(d) { return yScale(d.y); })
-        .attr("height", function(d) { return height - yScale(d.y); });
-    } else {
-      yScale.domain([0, yStackMax]);
-      d3.selectAll(".yAxis").remove();
-      histogram.append("g")
-        .attr("class", "yAxis")
-        .attr("transform", "translate(" + margin.left + ",0)")
-        .call(yAxis)
-        .append("text")
-          .attr("class", "label")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .text("Frequency");;
-
-      rect.transition().duration(500)
-        .attr("x", function(d) { return xScale(d.x); })
-        .attr("width", xScale.rangeBand())
-        .attr("y", function(d) { return yScale(d.y0 + d.y); })
-        .attr("height", function(d) { return yScale(d.y0) - yScale(d.y0 + d.y); });
-    }
-
-    //Reset Axes
-    d3.selectAll(".xAxis").remove();
-    d3.selectAll(".yAxis").remove();
-    histogram.append("g").attr("class", "xAxis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-        .append("text")
-          .attr("class", "label")
-          .attr("x", width/2)
-          .attr("y", 28)
-          .attr("dy", ".71em")
-          .style("text-anchor", "center")
-          .style("font-size", "12pt")
-          .text(category + " " + categoryToUnits[category]);
-    histogram.append("g").attr("class", "yAxis")
-        .attr("transform", "translate(" + margin.left + ",0)")
-        .call(yAxis)
-        .append("text")
-          .attr("class", "label")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .text("Frequency");
-  }
-  
-});
+              ];
 </script>
 
 
