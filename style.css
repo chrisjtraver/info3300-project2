@@ -153,3 +153,11 @@ div.scatterplot-tooltip {
 	text-align: center;
 	padding: 10px;
 }
+
+.conclusions {
+	padding: 50px;
+	margin-left: 8%;
+	margin-right: 8%;
+	margin-top:4%;
+	background: #e1e1e1;
+}
