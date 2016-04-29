@@ -34,8 +34,8 @@
         <div class="col-xs-12" id="mvp-stats"></div>
     </div>
     <div class="row player-visualizations2>"
-        <div class="left" id="mvp-graphs" style="float:left"></div>
-        <div class="right" id="mvp-trophies" style="float:right"></div>
+        <div id="mvp-graphs">
+        </div>
     </div>  
     <div class="row overall-stats-title">
         <div class="col-xs-12" >
@@ -167,8 +167,8 @@ mvpGraphWindow.append("text").text("to view their detailed stats")
   .attr("y", 240)
   .attr("x", 40)
   
-var mvpTrophies = d3.select("#mvp-trophies").append("svg")
-      .attr("width", 1000 + 20)
+var mvpTrophies = d3.select("#mvp-graphs").append("svg")
+      .attr("width", 600)
       .attr("height", 470 + margin.top + margin.bottom)
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");

@@ -70,12 +70,13 @@ body {
 }
 #mvp-graphs {
 	background: #e1e1e1;
+	text-align: center;
 }
 
 #mvp-trophies {
 	background: #e1e1e1;
 	overflow: hidden;
-	width: 670px;
+	/*width: 670px;*/
 }
 
 #title {
