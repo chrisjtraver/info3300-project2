@@ -1,7 +1,7 @@
 INFO 3300 - Project 2 - Cornell University
 ===================
 
-<a href="http://chrisjtraver.github.io/info3300project2">Visualization</a> | <a href="http://chrisjtraver.github.io/info3300project2/ProjectWriteup.pdf"> Written Description</a>
+<a href="https://chrisjtraver.github.io/info3300-project2">Visualization</a> | <a href="https://chrisjtraver.github.io/info3300-project2/ProjectWriteup.pdf"> Written Description</a>
 
 For this project we were tasked with creating an interactive data visualization. Our interface uses dynamic elements to show more 
 information than can be presented in a single view. We follow Shneiderman's formula of "overview first, zoom and filter, then details
